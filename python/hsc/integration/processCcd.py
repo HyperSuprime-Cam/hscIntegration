@@ -3,7 +3,7 @@ from hsc.integration.integration import CommandsTest
 
 import hsc.pipe.base.camera as hscCamera
 import lsst.meas.astrom.astrom as measAstrom
-
+import lsst.afw.image.utils as afwIU
 
 class ProcessCcdTest(CommandsTest):
     def __init__(self, name, camera, visit, ccd, dir=None, rerun=None, minMatches=30, minSources=1000,
@@ -42,5 +42,7 @@ class ProcessCcdTest(CommandsTest):
 
         matches = measAstrom.readMatches(butler, self.dataId)
         self.assertGreater("Number of matches", len(matches), self.minMatches)
+
+        afwIU.resetFilters() # So other cameras may be run        
 
         return self.success
