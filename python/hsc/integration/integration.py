@@ -1,9 +1,6 @@
 import os
 import subprocess, shlex
 
-import hsc.pipe.base.camera as hscCamera
-import lsst.meas.astrom.astrom as measAstrom
-
 
 class Integrator(object):
     def __init__(self, tests=[]):
@@ -43,6 +40,9 @@ class Test(object):
     def assertFalse(self, description, success):
         self.assertTrue(description, not success)
 
+    def assertEqual(self, description, obj1, obj2):
+        self.assertTrue(description + " (%s = %s)" % (obj1, obj2), obj1 == obj2)
+
     def assertGreater(self, description, num1, num2):
         self.assertTrue(description + " (%d > %d)" % (num1, num2), num1 > num2)
 
@@ -60,10 +60,10 @@ class Test(object):
 
 
 
-class CommandTest(Test):
-    def __init__(self, name, command, setups=[]):
-        super(CommandTest, self).__init__(name)
-        self.command = command
+class CommandsTest(Test):
+    def __init__(self, name, commandList, setups=[]):
+        super(CommandsTest, self).__init__(name)
+        self.commandList = commandList
         self.setups=[]
 
     def execute(self):
@@ -80,57 +80,21 @@ class CommandTest(Test):
 
         logger = Logger(self.log)
 
+        success = True
         def call(command):
             logger.write("*** Executing: %s\n" % command)
-            ret = subprocess.call(shlex.split(command), stdout=logger, stderr=subprocess.STDOUT)
+            if isinstance(command, basestring):
+                command = shlex.split(command)
+            ret = subprocess.call(command, stdout=logger, stderr=subprocess.STDOUT)
             logger.write("*** Return code: %d\n" % ret)
-            return ret
+            success = self.success and ret == 0
 
         for setup in self.setups:
             call("setup -j %s" % setup)
-            
+
         call("eups list -s")
-        ret = call(self.command)
+        for command in self.commandList:
+            call(command)
         self.stream = logger.stream # In case we want to grep the logs for validation
-        return ret == 0
-
-
-class ProcessCcdTest(CommandTest):
-    def __init__(self, name, camera, visit, ccd, dir=None, rerun=None, minMatches=30, minSources=2000,
-                 datasets=["icSrc", "icMatch", "src", "calexp"]
-
-                 ):
-        self.camera = camera
-        self.visit = visit
-        self.ccd = ccd
-        self.dataId = {'visit': visit, 'ccd': ccd}
-        self.dir = dir if dir is not None else os.environ['HSCINTEGRATIONDATA_DIR']
-        self.rerun = rerun
-        self.minMatches = minMatches
-        self.minSources = minSources
-        self.datasets = set(datasets)
-
-        command = os.path.join(os.environ['HSCPIPE_DIR'], 'bin', 'scProcessCcd.py') + \
-                  " " + camera + " " + self.dir + " --doraise --id visit=%d ccd=%d" % (self.visit, self.ccd)
-        
-        super(ProcessCcdTest, self).__init__(name, command)
-        
-
-    def validate(self):
-        butler = hscCamera.getButler(self.camera, rerun=self.rerun)
-
-        for ds in self.datasets:
-            self.assertTrue("%s exists" % ds, butler.datasetExists(datasetType=ds, dataId=self.dataId))
-            data = butler.get(ds, self.dataId)
-            if hasattr(data, '__subject__'):
-                # Foil read proxy
-                data = data.__subject__
-            self.assertTrue("%s readable" % ds, data)
-
-        src = butler.get('src', self.dataId)
-        self.assertGreater("Number of sources", len(src), self.minSources)
-
-        matches = measAstrom.readMatches(butler, self.dataId)
-        self.assertGreater("Number of matches", len(matches), self.minMatches)
-
-        return self.success
+        self.success = self.success and success
+        return success

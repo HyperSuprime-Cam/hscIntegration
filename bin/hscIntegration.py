@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
-from hsc.integration.integration import Integrator, ProcessCcdTest
+import os.path
+from hsc.integration.integration import Integrator
+from hsc.integration.processCcd import ProcessCcdTest
+from hsc.integration.data import DataTest
 
 integrator = Integrator(tests=[
-    ProcessCcdTest("SUPA01269695", "suprimecam", 126969, 5, dir="/home/price/data/Subaru/SUPA", rerun="test"),
+    DataTest("scData", "suprimecam", os.path.join(os.environ['HSCINTEGRATIONDATA_DIR'], 'SuprimeCam'), 'DATA'),
+    ProcessCcdTest("SUPA01269695", "suprimecam", 126969, 5, dir='DATA/SUPA', rerun="test"),
     ])
 
 integrator.run()
