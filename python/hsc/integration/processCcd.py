@@ -6,7 +6,7 @@ import lsst.meas.astrom.astrom as measAstrom
 
 
 class ProcessCcdTest(CommandsTest):
-    def __init__(self, name, camera, visit, ccd, dir=None, rerun=None, minMatches=30, minSources=2000,
+    def __init__(self, name, camera, visit, ccd, dir=None, rerun=None, minMatches=30, minSources=1000,
                  datasets=["icSrc", "icMatch", "src", "calexp"]
                  ):
         self.camera = camera

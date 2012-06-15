@@ -37,3 +37,19 @@ class DataTest(CommandsTest):
         registry = os.path.join(self.target, self.registryDir, "registry.sqlite3")
         self.assertTrue("Registry created", os.path.isfile(registry))
         return True
+
+class CalibTest(CommandsTest):
+    def __init__(self, name, camera, source, target, validity=None):
+        self.target = target
+        copy = ["cp", "-r", source, os.path.join(target)]
+        generate = [os.path.join(os.environ['OBS_SUBARU_DIR'], "bin", "genCalibRegistry.py"),
+                   "--create", "--root=" + target, "--camera=" + camera]
+        if validity is not None:
+            generate += ["--validity=%d" % validity]
+                       
+        super(CalibTest, self).__init__(name, [copy, generate])
+
+    def validate(self):
+        registry = os.path.join(self.target, "calibRegistry.sqlite3")
+        self.assertTrue("Registry created", os.path.isfile(registry))
+        return True
