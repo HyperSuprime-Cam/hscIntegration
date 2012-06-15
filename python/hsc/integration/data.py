@@ -14,7 +14,7 @@ class DataTest(CommandsTest):
         if camera.lower() in ("suprimecam", "suprime-cam", "sc"):
             refileScript = "refileSupaFiles.py"
             self.registryDir = "SUPA"
-        elif camera.lower() in ("hsc"):
+        elif camera.lower() in ("hsc", "hscsim"):
             refileScript = "refileHSCFiles.py"
             self.registryDir = "HSC"
         else:
@@ -28,7 +28,7 @@ class DataTest(CommandsTest):
 
     def validate(self):
         found = set()
-        for dirpath, dirnames, filenames in os.walk(self.target):
+        for dirpath, dirnames, filenames in os.walk(os.path.join(self.target, self.registryDir)):
             for f in filenames:
                 if f.endswith('.fits'):
                     found.add(f)
