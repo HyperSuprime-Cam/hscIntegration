@@ -16,11 +16,11 @@ class DataTest(CommandsTest):
             self.registryDir = "SUPA"
         elif camera.lower() in ("hsc"):
             refileScript = "refileHSCFiles.py"
-            self.registryDir = "HSCA"
+            self.registryDir = "HSC"
         else:
             raise RuntimeError("Unrecognised camera: %s" % camera)
         commandList = [[os.path.join(os.environ['OBS_SUBARU_DIR'], "bin", refileScript),
-                        "--copy", "--execute", "--root=" + target] + inputs,
+                        "--link", "--execute", "--root=" + target] + inputs,
                        [os.path.join(os.environ['OBS_SUBARU_DIR'], "bin", "genInputRegistry.py"),
                         "--create", "--root=" + os.path.join(target, self.registryDir), "--camera=" + camera]
                        ]
@@ -41,13 +41,20 @@ class DataTest(CommandsTest):
 class CalibTest(CommandsTest):
     def __init__(self, name, camera, source, target, validity=None):
         self.target = target
-        copy = ["cp", "-r", source, os.path.join(target)]
+        commandList = []
+        for dirpath, dirnames, filenames in os.walk(source):
+            targetDir = os.path.join(target, os.path.relpath(dirpath, source))
+            if not os.path.isdir(targetDir):
+                os.makedirs(targetDir)
+            for f in filenames:
+                commandList.append(["ln", "-s", os.path.join(dirpath, f), os.path.join(targetDir, f)])
         generate = [os.path.join(os.environ['OBS_SUBARU_DIR'], "bin", "genCalibRegistry.py"),
                    "--create", "--root=" + target, "--camera=" + camera]
         if validity is not None:
             generate += ["--validity=%d" % validity]
-                       
-        super(CalibTest, self).__init__(name, [copy, generate])
+
+        commandList.append(generate)
+        super(CalibTest, self).__init__(name, commandList)
 
     def validate(self):
         registry = os.path.join(self.target, "calibRegistry.sqlite3")
