@@ -35,7 +35,7 @@ class ProcessCcdTest(CommandsTest):
             if hasattr(data, '__subject__'):
                 # Foil read proxy
                 data = data.__subject__
-            self.assertTrue("%s readable" % ds, data)
+            self.assertTrue("%s readable (%s)" % (ds, data.__class__), data)
 
         src = butler.get('src', self.dataId)
         self.assertGreater("Number of sources", len(src), self.minSources)
