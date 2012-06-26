@@ -24,11 +24,13 @@ class Test(object):
 
     def run(self):
         try:
-            success = self.execute() and self.validate()
+            if self.success:
+                self.execute()
+            if self.success:
+                self.validate()
         except Exception, e:
             self.log.write("*** Caught exception %s: %s\n" % (e.__class__, e))
-            success = False
-        return success and self.success
+        return self.success
 
     def execute(self):
         raise NotImplemented("Should be implemented by subclass")
@@ -65,11 +67,22 @@ class CommandsTest(Test):
         super(CommandsTest, self).__init__(name)
         self.commandList = commandList
         self.setups=[]
+        self.stream = None
+
+    def _call(self, command, stdout=sys.stdout):
+        """Execute a command, returning success rather than exit code"""
+        self.log.write("*** Executing: %s\n" % command)
+        if isinstance(command, basestring):
+            command = shlex.split(command)
+        ret = subprocess.call(command, stdout=stdout, stderr=subprocess.STDOUT)
+        self.log.write("*** Return code: %d\n" % ret)
+        return ret == 0
 
     def execute(self):
         class Logger(object):
-            def __init__(self, log):
-                self.log = log
+            """A replacement for stdout that writes to our log file as well as saving the stream as a string"""
+            def __init__(self, logFile):
+                self.log = logFile
                 self.stream = ""
             def write(self, s):
                 self.log.write(s)
@@ -80,21 +93,59 @@ class CommandsTest(Test):
 
         logger = Logger(self.log)
 
-        success = True
-        def call(command):
-            logger.write("*** Executing: %s\n" % command)
-            if isinstance(command, basestring):
-                command = shlex.split(command)
-            ret = subprocess.call(command, stdout=logger, stderr=subprocess.STDOUT)
-            logger.write("*** Return code: %d\n" % ret)
-            success = self.success and ret == 0
-
         for setup in self.setups:
-            call("setup -j %s" % setup)
+            if not call("setup -j %s" % setup, stdout=logger):
+                self.success = False
+                self.log.write("*** Failed.")
+                return
 
         call("eups list -s")
         for command in self.commandList:
-            call(command)
+            if not call(command):
+                self.success = False
+                self.log.write("*** Failed.")
+                break
         self.stream = logger.stream # In case we want to grep the logs for validation
-        self.success = self.success and success
-        return success
+
+
+class PbsTest(CommandsTest):
+    """Test a command that submits a job to PBS.
+
+    This assumes that the command to be run produces a single line of output containing solely the PBS job
+    identifier.  If this is not the case, override the getIdentifier() method.
+
+    By default, the execution blocks until the job is done.  This is not the most efficient way to do multiple
+    tests, but it's easy and involves the least modification to the integrator.  This behaviour can be
+    disabled by setting wait=False in the constructor.
+
+    The SLEEP class variable controls the length of time between qstat polls.
+    """
+    
+    SLEEP = 60 # Number of seconds to sleep between polling qstat
+
+    def __init__(self, name, commandList, setups=[], wait=True):
+        super(PbsTest, self).__init__(name, commandList, setups=setups)
+        self.wait = wait
+        
+    def execute(self):
+        super(PbsTest, self).execute()
+        self.job = self.getIdentifier(self.stream)
+        if self.wait:
+            self._wait()
+        
+    def getIdentifier(self, stream):
+        """Get the PBS job identifier from the provided stream string"""
+        lines = re.split("\n", stream)
+        if len(lines) != 1:
+            self.log.write("*** ERROR: Expected only a single output line, containing the PBS job identifier")
+            self.success = False
+            return None
+        return lines[0]
+
+    def _wait(self):
+        """Block until the job is done"""
+        while True:
+            time.sleep(self.SLEEP)
+            if not self._call("qstat " + self.job, stdout=self.log):
+                # Can't find job, so we must be done
+                return
