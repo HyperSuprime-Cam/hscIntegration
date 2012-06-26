@@ -7,7 +7,7 @@ import lsst.afw.image.utils as afwIU
 
 class ProcessCcdTest(CommandsTest):
     def __init__(self, name, camera, visit, ccd, dir=None, rerun=None, minMatches=30, minSources=1000,
-                 datasets=["icSrc", "icMatch", "src", "calexp"]
+                 datasets=["icSrc", "icMatch", "psf", "apCorr", "src", "calexp"]
                  ):
         self.camera = camera
         self.visit = visit
