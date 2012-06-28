@@ -1,6 +1,5 @@
 import os
 import sys
-import re
 import time
 import subprocess, shlex
 
@@ -166,8 +165,8 @@ class PbsTest(CommandsTest):
         
     def getIdentifier(self, stream):
         """Get the PBS job identifier from the provided stream string"""
-        lines = re.split("\n", stream.strip())
-        if len(lines) != 1 or not re.search("^\d+", lines[0]):
+        lines = stream.strip().splitlines()
+        if len(lines) != 1 or not lines[0][0].isdigit():
             self.log.write("*** ERROR: Expected only a single output line, containing the PBS job identifier")
             return None
         return lines[0]
