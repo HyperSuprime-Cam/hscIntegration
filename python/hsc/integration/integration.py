@@ -183,3 +183,10 @@ class PbsTest(CommandsTest):
     def validatePbs(self):
         pbsLog = self.name + ".o" + self.job.partition('.')[0]
         self.assertTrue("PBS log file is " + pbsLog, os.path.isfile(pbsLog))
+
+        bad = False
+        for line in open(pbsLog):
+            if line.startswith("=>> PBS: job killed") or \
+               line.startswith("=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES"):
+                bad = True
+        self.assertFalse("PBS log file clean of incompletion indicators", bad)
