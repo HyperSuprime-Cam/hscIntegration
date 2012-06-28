@@ -6,7 +6,7 @@ import hsc.pipe.base.camera as hscCamera
 import lsst.afw.image.utils as afwIU
 
 class ReduceFramesTest(PbsTest, CcdValidationTest):
-    def __init__(self, name, camera, visits, nodes=2, procs=8, time=1200, queue=None, dir=None, rerun=None,
+    def __init__(self, name, camera, visits, nodes=4, procs=8, time=1200, queue=None, dir=None, rerun=None,
                  **kwargs):
         self.camera = camera
         self.visits = visits
@@ -15,6 +15,7 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
 
         suprimeDataDir = os.path.split(os.path.abspath(self.dir))
         if suprimeDataDir[-1] in ("SUPA", "HSC"):
+            # hsc.pipe.base.camera.getButler will add this directory on
             suprimeDataDir = suprimeDataDir[:-1]
         os.environ['SUPRIME_DATA_DIR'] = os.path.join(*suprimeDataDir)
 
