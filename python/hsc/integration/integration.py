@@ -178,3 +178,8 @@ class PbsTest(CommandsTest):
                 # Can't find job, so we must be done
                 return
             time.sleep(self.SLEEP)
+
+    @guard
+    def validatePbs(self):
+        pbsLog = self.name + ".o" + self.job.partition('.')[0]
+        self.assertTrue("PBS log file is " + pbsLog, os.path.isfile(pbsLog))
