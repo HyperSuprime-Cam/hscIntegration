@@ -13,7 +13,10 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
         self.dir = dir if dir is not None else os.environ['HSCINTEGRATIONDATA_DIR']
         self.rerun = rerun
 
-        os.environ['SUPRIME_DATA_DIR'] = dir if dir is not None else os.environ['HSCINTEGRATIONDATA_DIR']
+        suprimeDataDir = os.path.split(os.path.abspath(self.dir))
+        if suprimeDataDir[-1] in ("SUPA", "HSC"):
+            suprimeDataDir = suprimeDataDir[:-1]
+        os.environ['SUPRIME_DATA_DIR'] = os.path.join(*suprimeDataDir)
 
         command = os.path.join(os.environ['HSCPIPE_DIR'], 'bin', 'reduceFrames.py') + " "
         command += " --job=" + name
@@ -21,8 +24,6 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
         command += " --nodes=%d" % nodes
         command += " --procs=%d" % procs
         command += " --time=%f" % time
-        if dir is not None:
-            command += " --output=%s" % dir
         if rerun is not None:
             command += " --rerun=" + rerun
         if queue is not None:
@@ -30,8 +31,10 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
         command += " " + ' '.join(map(str, visits))
         
         super(ReduceFramesTest, self).__init__(name, [command], **kwargs)
-        
+
     def validate(self):
+        self.validatePbs()
+        
         butler = hscCamera.getButler(self.camera, rerun=self.rerun, root=self.dir)
         numCcds = hscCamera.getNumCcds(self.camera)
 
