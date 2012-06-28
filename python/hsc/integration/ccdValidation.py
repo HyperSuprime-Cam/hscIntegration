@@ -4,7 +4,7 @@ import lsst.meas.astrom.astrom as measAstrom
 
 class CcdValidationTest(Test):
     """Mix-in class to validate a CCD"""
-    def __init__(self, name, minMatches=30, minSources=1000,
+    def __init__(self, name, minMatches=30, minSources=300,
                  datasets=["icSrc", "icMatch", "psf", "apCorr", "src", "calexp"],
                  **kwargs):
         super(CcdValidationTest, self).__init__(name, **kwargs)
