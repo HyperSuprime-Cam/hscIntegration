@@ -1,4 +1,7 @@
 import os
+import sys
+import re
+import time
 import subprocess, shlex
 
 
@@ -15,6 +18,16 @@ class Integrator(object):
             print "Test %s: %s" % (test.name, "PASS" if success else "FAIL")
 
 
+def guard(method):
+    """Decorator to guard a method against exceptions"""
+    def guarded(self, *args, **kwargs):
+        try:
+            return method(self, *args, **kwargs)
+        except Exception, e:
+            self.log.write("*** Caught exception %s: %s\n" % (e.__class__, e))
+            self.success = False
+    return guarded
+
 
 class Test(object):
     def __init__(self, name):
@@ -30,6 +43,7 @@ class Test(object):
                 self.validate()
         except Exception, e:
             self.log.write("*** Caught exception %s: %s\n" % (e.__class__, e))
+            self.success = False
         return self.success
 
     def execute(self):
@@ -42,18 +56,23 @@ class Test(object):
     def assertFalse(self, description, success):
         self.assertTrue(description, not success)
 
+    @guard
     def assertEqual(self, description, obj1, obj2):
         self.assertTrue(description + " (%s = %s)" % (obj1, obj2), obj1 == obj2)
 
+    @guard
     def assertGreater(self, description, num1, num2):
         self.assertTrue(description + " (%d > %d)" % (num1, num2), num1 > num2)
 
+    @guard
     def assertLess(self, description, num1, num2):
         self.assertTrue(description + " (%d < %d)" % (num1, num2), num1 < num2)
 
+    @guard
     def assertGreaterEqual(self, description, num1, num2):
         self.assertTrue(description + " (%d >= %d)" % (num1, num2), num1 >= num2)
 
+    @guard
     def assertLessEqual(self, description, num1, num2):
         self.assertTrue(description + " (%d <= %d)" % (num1, num2), num1 <= num2)
 
@@ -63,8 +82,8 @@ class Test(object):
 
 
 class CommandsTest(Test):
-    def __init__(self, name, commandList, setups=[]):
-        super(CommandsTest, self).__init__(name)
+    def __init__(self, name, commandList, setups=[], **kwargs):
+        super(CommandsTest, self).__init__(name, **kwargs)
         self.commandList = commandList
         self.setups=[]
         self.stream = None
@@ -74,7 +93,14 @@ class CommandsTest(Test):
         self.log.write("*** Executing: %s\n" % command)
         if isinstance(command, basestring):
             command = shlex.split(command)
-        ret = subprocess.call(command, stdout=stdout, stderr=subprocess.STDOUT)
+
+        # We would use subprocess.call() except that doesn't allow us to capture output (it wants to write to
+        # a file descriptor, even if given a file, so we can't use our Logger to capture the stream).
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        out,err = proc.communicate()
+        stdout.write(out)
+        ret = proc.returncode
+
         self.log.write("*** Return code: %d\n" % ret)
         return ret == 0
 
@@ -88,20 +114,21 @@ class CommandsTest(Test):
                 self.log.write(s)
                 self.log.flush()
                 self.stream += s
-            def fileno(self):
-                return self.log.fileno()
 
         logger = Logger(self.log)
 
         for setup in self.setups:
-            if not call("setup -j %s" % setup, stdout=logger):
+            if not self._call("setup -j %s" % setup, stdout=self.log):
                 self.success = False
                 self.log.write("*** Failed.")
                 return
 
-        call("eups list -s")
+        if not self._call("eups list -s", stdout=self.log):
+            self.success = False
+            self.log.write("*** Failed.")
+            return
         for command in self.commandList:
-            if not call(command):
+            if not self._call(command, stdout=logger):
                 self.success = False
                 self.log.write("*** Failed.")
                 break
@@ -121,7 +148,7 @@ class PbsTest(CommandsTest):
     The SLEEP class variable controls the length of time between qstat polls.
     """
     
-    SLEEP = 60 # Number of seconds to sleep between polling qstat
+    SLEEP = 30 # Number of seconds to sleep between polling qstat
 
     def __init__(self, name, commandList, setups=[], wait=True):
         super(PbsTest, self).__init__(name, commandList, setups=setups)
@@ -130,22 +157,25 @@ class PbsTest(CommandsTest):
     def execute(self):
         super(PbsTest, self).execute()
         self.job = self.getIdentifier(self.stream)
-        if self.wait:
+        print "Test %s: waiting for PBS job %s" % (self.name, self.job)
+        if self.job is None:
+            self.success = False
+            return False
+        if self.wait and self.success:
             self._wait()
         
     def getIdentifier(self, stream):
         """Get the PBS job identifier from the provided stream string"""
-        lines = re.split("\n", stream)
-        if len(lines) != 1:
+        lines = re.split("\n", stream.strip())
+        if len(lines) != 1 or not re.search("^\d+", lines[0]):
             self.log.write("*** ERROR: Expected only a single output line, containing the PBS job identifier")
-            self.success = False
             return None
         return lines[0]
 
     def _wait(self):
         """Block until the job is done"""
         while True:
-            time.sleep(self.SLEEP)
             if not self._call("qstat " + self.job, stdout=self.log):
                 # Can't find job, so we must be done
                 return
+            time.sleep(self.SLEEP)
