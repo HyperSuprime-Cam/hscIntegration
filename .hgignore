@@ -1,0 +1,26 @@
+syntax: glob
+*~
+*.o
+*.so
+*.dylib
+*.os
+*.la
+*.a
+*.pyo
+*.pyc
+*.cfgc
+*.fits
+.sconf_temp/*
+.sconsign.dblite
+config.log
+python/hsc/integration/version.py
+
+syntax: regexp
+^\#.*\#$
+^\.fuse.*
+^\.scon*
+^\.config.log$
+^TAGS$
+^core$
+^core\.
+
