@@ -38,11 +38,14 @@ class Test(object):
         try:
             if self.success:
                 self.execute()
+                self.log.flush()
             if self.success:
                 self.validate()
+                self.log.flush()
         except Exception, e:
             self.log.write("*** Caught exception %s: %s\n" % (e.__class__, e))
             self.success = False
+        self.log.flush()
         return self.success
 
     def execute(self):
