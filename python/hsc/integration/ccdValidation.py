@@ -1,4 +1,4 @@
-from hsc.integration.integration import Test, guard
+from hsc.integration.test import Test, guard
 import lsst.meas.astrom.astrom as measAstrom
 
 

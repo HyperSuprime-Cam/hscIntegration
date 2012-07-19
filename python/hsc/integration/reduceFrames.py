@@ -1,5 +1,6 @@
 import os, os.path
-from hsc.integration.integration import PbsTest
+from hsc.integration.test import PbsTest
+from hsc.integration.camera import CameraInfo
 from hsc.integration.ccdValidation import CcdValidationTest
 
 import hsc.pipe.base.camera as hscCamera
@@ -10,14 +11,7 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
                  **kwargs):
         self.camera = camera
         self.visits = visits
-        self.dir = dir if dir is not None else os.environ['HSCINTEGRATIONDATA_DIR']
         self.rerun = rerun
-
-        suprimeDataDir = os.path.split(os.path.abspath(self.dir))
-        if suprimeDataDir[-1] in ("SUPA", "HSC"):
-            # hsc.pipe.base.camera.getButler will add this directory on
-            suprimeDataDir = suprimeDataDir[:-1]
-        os.environ['SUPRIME_DATA_DIR'] = os.path.join(*suprimeDataDir)
 
         command = os.path.join(os.environ['HSCPIPE_DIR'], 'bin', 'reduceFrames.py') + " "
         command += " --job=" + name
@@ -33,10 +27,19 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
         
         super(ReduceFramesTest, self).__init__(name, [command], **kwargs)
 
-    def validate(self):
+    def preHook(self, workDir="."):
+        suprimeDataDir = os.path.split(os.path.abspath(workDir))
+        if suprimeDataDir[-1] in ("SUPA", "HSC"):
+            # hsc.pipe.base.camera.getButler will add this directory on
+            suprimeDataDir = suprimeDataDir[:-1]
+        os.environ['SUPRIME_DATA_DIR'] = os.path.join(*suprimeDataDir)
+
+    def validate(self, workDir="."):
         self.validatePbs()
         
-        butler = hscCamera.getButler(self.camera, rerun=self.rerun, root=self.dir)
+        cameraInfo = CameraInfo(self.camera)
+        butler = hscCamera.getButler(self.camera, rerun=self.rerun,
+                                     root=os.path.join(workDir, cameraInfo.addDir))
         numCcds = hscCamera.getNumCcds(self.camera)
 
         for visit in self.visits:
@@ -44,4 +47,5 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
                 dataId = {'visit': visit, 'ccd': ccd}
                 self.validateCcd(butler, dataId)
 
+    def postHook(self, *args, **kwargs):
         afwIU.resetFilters() # So other cameras may be run        
