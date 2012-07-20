@@ -33,15 +33,19 @@ class DataTest(CommandsTest):
         return True
 
 class CalibTest(CommandsTest):
-    def __init__(self, name, camera, source, validity=None):
+    def __init__(self, name, camera, source=None, validity=None):
         self.camera = camera
         self.source = source
         commandList = []
         cameraInfo = CameraInfo(camera)
-        for dirpath, dirnames, filenames in os.walk(source):
-            targetDir = os.path.join("@WORKDIR@", cameraInfo.addDir, "CALIB", os.path.relpath(dirpath, source))
-            for f in filenames:
-                commandList.append(["ln", "-s", os.path.join(dirpath, f), os.path.join(targetDir, f)])
+        if source is not None:
+            # Get calibrations from the source
+            for dirpath, dirnames, filenames in os.walk(source):
+                targetDir = os.path.join("@WORKDIR@", cameraInfo.addDir, "CALIB",
+                                         os.path.relpath(dirpath, source))
+                for f in filenames:
+                    commandList.append(["ln", "-s", os.path.join(dirpath, f), os.path.join(targetDir, f)])
+
         generate = [os.path.join(os.environ['OBS_SUBARU_DIR'], "bin", "genCalibRegistry.py"),
                    "--create", "--root=@WORKDIR@/" + os.path.join(cameraInfo.addDir, "CALIB"),
                     "--camera=" + camera]
@@ -56,12 +60,13 @@ class CalibTest(CommandsTest):
         return os.path.join(workDir, cameraInfo.addDir, "CALIB")
 
     def execute(self, workDir="."):
-        # Make output directories first
-        target = self.getTargetDir(workDir)
-        for dirpath, dirnames, filenames in os.walk(self.source):
-            targetDir = os.path.join(target, os.path.relpath(dirpath, self.source))
-            if not os.path.isdir(targetDir):
-                os.makedirs(targetDir)
+        if self.source is not None:
+            # Make output directories first, so we can link
+            target = self.getTargetDir(workDir)
+            for dirpath, dirnames, filenames in os.walk(self.source):
+                targetDir = os.path.join(target, os.path.relpath(dirpath, self.source))
+                if not os.path.isdir(targetDir):
+                    os.makedirs(targetDir)
         super(CalibTest, self).execute(workDir=workDir)
 
     def validate(self, workDir="."):

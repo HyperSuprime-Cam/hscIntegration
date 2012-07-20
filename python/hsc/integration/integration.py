@@ -23,3 +23,7 @@ class Integration(object):
     @classmethod
     def register(cls, test):
         cls._known[test.name] = test
+
+    @classmethod
+    def getTests(cls):
+        return cls._known.keys()
