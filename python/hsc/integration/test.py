@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import datetime
 import subprocess, shlex
 
 def guard(method):
@@ -18,6 +19,7 @@ class Test(object):
     def __init__(self, name):
         self.name = name
         self.log = open("%s.log" % self.name, "a")
+        self.log.write("*** Test run starting at %s\n" % datetime.datetime.now())
         self.success = True
 
     def run(self, workDir="."):
