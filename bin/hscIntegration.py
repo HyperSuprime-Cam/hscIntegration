@@ -24,7 +24,7 @@ Integration.register(SolveTansipTest("solvetansip", "suprimecam", 108723, rerun=
 Integration.register(DataTest("hscData", "hscsim", os.path.join(dataDir, 'HSC')))
 Integration.register(CalibTest("hscCalib", "hscsim", os.path.join(dataDir, 'HSC-Calib')))
 Integration.register(ProcessCcdTest("HSCA00243100", "hscsim", 243, 100, rerun="processCcd"))
-Integration.register(ReduceFramesTest("HSCA00243XXX", "hsc", [243], rerun="reduceFrames", time=12000))
+Integration.register(ReduceFramesTest("HSCA00243XXX", "hsc", [243], rerun="reduceFrames", time=20000))
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--no-suprimecam", dest="noSC", default=False, action="store_true",
