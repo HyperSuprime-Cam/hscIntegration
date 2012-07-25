@@ -185,6 +185,9 @@ class PbsTest(CommandsTest):
         bad = False
         for line in open(pbsLog):
             if line.startswith("=>> PBS: job killed") or \
-               line.startswith("=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES"):
+               line.startswith("=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES") or\
+               line.startswith("Uncaught exception caused abortion") or \
+               line.startswith("application called MPI_Abort"):
                 bad = True
+                break
         self.assertFalse("PBS log file clean of incompletion indicators", bad)
