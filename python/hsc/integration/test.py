@@ -115,7 +115,7 @@ class CommandsTest(Test):
                 self.log.write("*** Failed.\n")
                 return
 
-        if not self._call("eups list -s", stdout=self.log):
+        if not self._call("eups list -s --nolocks", stdout=self.log):
             self.success = False
             self.log.write("*** Failed.\n")
             return
