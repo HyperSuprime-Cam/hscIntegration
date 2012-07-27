@@ -15,9 +15,9 @@ class Integration(object):
     def addTest(self, test):
         self._tests[test.name] = test
 
-    def run(self, workDir="."):
+    def run(self, **kwargs):
         for test in self._tests.itervalues():
-            success = test.run(workDir=workDir)
+            success = test.run(**kwargs)
             print "Test %s: %s" % (test.name, "PASS" if success else "FAIL")
 
     @classmethod

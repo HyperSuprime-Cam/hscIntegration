@@ -25,7 +25,7 @@ class Test(object):
     def run(self, **kwargs):
         for method in ('preHook', 'execute', 'validate', 'postHook'):
             @guard
-            def runMethod(self, ***runKwargs):
+            def runMethod(self, **runKwargs):
                 getattr(self, method)(**runKwargs)
 
             self.log.write("*** Running %s %s\n" % (self.name, method))
@@ -119,12 +119,8 @@ class CommandsTest(Test):
             self.success = False
             self.log.write("*** Failed.\n")
             return
+        self.commandList = substituteList(self.commandList, "@WORKDIR@", workDir)
         for command in self.commandList:
-            if isinstance(command, basestring):
-                command = command.replace("@WORKDIR@", workDir)
-            else:
-                for i, cmd in enumerate(command):
-                    command[i] = cmd.replace("@WORKDIR@", workDir)
             if not self._call(command, stdout=logger):
                 self.success = False
                 self.log.write("*** Failed.")
@@ -152,10 +148,8 @@ class PbsTest(CommandsTest):
         self.wait = wait
         
     def execute(self, nodes=4, procs=8, **kwargs):
-        for command in self.commandList:
-            for i, cmd in enumerate(command):
-                command[i] = cmd.replace("@NODES@", nodes).replace("@PROCS@", procs)
-
+        self.commandList = substituteList(self.commandList, "@NODES@", str(nodes))
+        self.commandList = substituteList(self.commandList, "@PROCS@", str(procs))
         super(PbsTest, self).execute()
         self.job = self.getIdentifier(self.stream)
         print "Test %s: waiting for PBS job %s" % (self.name, self.job)
@@ -195,3 +189,9 @@ class PbsTest(CommandsTest):
                 bad = True
                 break
         self.assertFalse("PBS log file clean of incompletion indicators", bad)
+
+
+def substituteList(inList, old, new):
+    """For each of the values in inList, replace 'old' with 'new', and descend recursively"""
+    return [val.replace(old, new) if isinstance(val, basestring) else substituteList(val, old, new) for
+            val in inList]

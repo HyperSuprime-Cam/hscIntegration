@@ -7,7 +7,7 @@ import hsc.pipe.base.camera as hscCamera
 import lsst.afw.image.utils as afwIU
 
 class ReduceFramesTest(PbsTest, CcdValidationTest):
-    def __init__(self, name, camera, visits, nodes=4, procs=8, time=1200, queue=None, rerun=None, **kwargs):
+    def __init__(self, name, camera, visits, time=1200, queue=None, rerun=None, **kwargs):
         self.camera = camera
         self.visits = visits
         self.rerun = rerun
@@ -15,8 +15,8 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
         command = os.path.join(os.environ['HSCPIPE_DIR'], 'bin', 'reduceFrames.py') + " "
         command += " --job=" + name
         command += " --instrument=" + camera
-        command += " --nodes=@NODES@" % nodes
-        command += " --procs=@PROCS@" % procs
+        command += " --nodes=@NODES@"
+        command += " --procs=@PROCS@"
         command += " --time=%f" % time
         if rerun is not None:
             command += " --rerun=" + rerun
