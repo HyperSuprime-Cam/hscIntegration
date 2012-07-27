@@ -54,7 +54,7 @@ class DbCreateTest(CommandsTest, DbValidateTest):
         query = "SELECT * FROM %s" % cameraInfo.fileTable
         numRowsValidate = lambda num: num == 0
 
-        super(DbCreateTest, self).__init__(name, ["echo $PGPASSFILE", command], dbHost=dbHost, dbName=dbName, 
+        super(DbCreateTest, self).__init__(name, [command], dbHost=dbHost, dbName=dbName, 
                                            dbUser=dbUser, dbPass=dbPass, query=query,
                                            numRowsValidate=numRowsValidate, **kwargs)
 
@@ -76,6 +76,7 @@ class DbRawTest(CommandsTest, DbValidateTest):
 
                 command = os.path.join(os.environ['HSCDB_DIR'], 'bin', cameraInfo.dbRaw)
                 command += " --execute --copy --root=@WORKDIR@"
+                command += " --dbhost " + dbHost + " --dbname " + dbName
                 command += " " + os.path.join(dirpath, f)
                 commandList.append(command)
 
