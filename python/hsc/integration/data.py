@@ -20,7 +20,7 @@ class DataTest(CommandsTest):
                        ]
         super(DataTest, self).__init__(name, commandList)
 
-    def validate(self, workDir="."):
+    def validate(self, workDir=".", **kwargs):
         found = set()
         for dirpath, dirnames, filenames in os.walk(os.path.join(workDir, self.registryDir)):
             for f in filenames:
@@ -59,7 +59,7 @@ class CalibTest(CommandsTest):
         cameraInfo = CameraInfo(self.camera)
         return os.path.join(workDir, cameraInfo.addDir, "CALIB")
 
-    def execute(self, workDir="."):
+    def execute(self, workDir=".", **kwargs):
         if self.source is not None:
             # Make output directories first, so we can link
             target = self.getTargetDir(workDir)
@@ -67,9 +67,9 @@ class CalibTest(CommandsTest):
                 targetDir = os.path.join(target, os.path.relpath(dirpath, self.source))
                 if not os.path.isdir(targetDir):
                     os.makedirs(targetDir)
-        super(CalibTest, self).execute(workDir=workDir)
+        super(CalibTest, self).execute(workDir=workDir, **kwargs)
 
-    def validate(self, workDir="."):
+    def validate(self, workDir=".", **kwargs):
         target = self.getTargetDir(workDir)
         registry = os.path.join(target, "calibRegistry.sqlite3")
         self.assertTrue("Registry created", os.path.isfile(registry))

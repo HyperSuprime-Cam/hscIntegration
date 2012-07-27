@@ -22,21 +22,21 @@ class Test(object):
         self.log.write("*** Test run starting at %s\n" % datetime.datetime.now())
         self.success = True
 
-    def run(self, workDir="."):
+    def run(self, **kwargs):
         for method in ('preHook', 'execute', 'validate', 'postHook'):
             @guard
-            def runMethod(self, *args, **kwargs):
-                getattr(self, method)(*args, **kwargs)
+            def runMethod(self, ***runKwargs):
+                getattr(self, method)(**runKwargs)
 
             self.log.write("*** Running %s %s\n" % (self.name, method))
-            runMethod(self, workDir=workDir)
+            runMethod(self, **kwargs)
             self.log.flush()
         return self.success
 
-    def preHook(self, workDir="."):
+    def preHook(self, **kwargs):
         pass
 
-    def execute(self, workDir="."):
+    def execute(self, **kwargs):
         raise NotImplemented("Should be implemented by subclass")
 
     def assertTrue(self, description, success):
@@ -66,10 +66,10 @@ class Test(object):
     def assertLessEqual(self, description, num1, num2):
         self.assertTrue(description + " (%d <= %d)" % (num1, num2), num1 <= num2)
 
-    def validate(self, workDir="."):
+    def validate(self, **kwargs):
         raise NotImplemented("Should be implemented by subclass")
 
-    def postHook(self, workDir="."):
+    def postHook(self, **kwargs):
         pass
 
 
@@ -96,7 +96,7 @@ class CommandsTest(Test):
         self.log.write("*** Return code: %d\n" % ret)
         return ret == 0
 
-    def execute(self, workDir="."):
+    def execute(self, workDir=".", **kwargs):
         class Logger(object):
             """A replacement for stdout that writes to our log file as well as saving the stream as a string"""
             def __init__(self, logFile):
@@ -151,7 +151,11 @@ class PbsTest(CommandsTest):
         super(PbsTest, self).__init__(name, commandList, setups=setups)
         self.wait = wait
         
-    def execute(self, *args, **kwargs):
+    def execute(self, nodes=4, procs=8, **kwargs):
+        for command in self.commandList:
+            for i, cmd in enumerate(command):
+                command[i] = cmd.replace("@NODES@", nodes).replace("@PROCS@", procs)
+
         super(PbsTest, self).execute()
         self.job = self.getIdentifier(self.stream)
         print "Test %s: waiting for PBS job %s" % (self.name, self.job)

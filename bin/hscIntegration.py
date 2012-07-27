@@ -24,7 +24,7 @@ Integration.register(SolveTansipTest("solvetansip", "suprimecam", 108723, rerun=
 Integration.register(DataTest("hscData", "hscsim", os.path.join(dataDir, 'HSC')))
 Integration.register(CalibTest("hscCalib", "hscsim", os.path.join(dataDir, 'HSC-Calib')))
 Integration.register(ProcessCcdTest("HSCA00243100", "hscsim", 243, 100, rerun="processCcd"))
-Integration.register(ReduceFramesTest("HSCA00243XXX", "hsc", [243], rerun="reduceFrames", time=20000))
+Integration.register(ReduceFramesTest("HSCA00243XXX", "hsc", [243], rerun="reduceFrames", time=30000))
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--no-suprimecam", dest="noSC", default=False, action="store_true",
@@ -39,6 +39,8 @@ parser.add_argument("--no-solvetansip", dest="noSolveTansip", default=False, act
                     help="Don't execute solvetansip tests?")
 parser.add_argument("--only", action="append", help="Only execute specified tests")
 parser.add_argument("--output", type=str, default=".", help="Output path")
+parser.add_argument("--nodes", type=int, default=4, help="Number of nodes for PBS")
+parser.add_argument("--procs", type=int, default=8, help="Number of processors per node for PBS")
 args = parser.parse_args()
 
 suprimecamTests = {"scData", "scCalib", "SUPA01087235", "SUPA0108723X"}
@@ -64,4 +66,4 @@ else:
     if args.noSolveTansip:
         exclude |= solvetansipTests
 
-Integration(exclude).run(workDir=args.output)
+Integration(exclude).run(workDir=args.output, nodes=args.nodes, procs=args.procs)

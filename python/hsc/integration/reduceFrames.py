@@ -15,8 +15,8 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
         command = os.path.join(os.environ['HSCPIPE_DIR'], 'bin', 'reduceFrames.py') + " "
         command += " --job=" + name
         command += " --instrument=" + camera
-        command += " --nodes=%d" % nodes
-        command += " --procs=%d" % procs
+        command += " --nodes=@NODES@" % nodes
+        command += " --procs=@PROCS@" % procs
         command += " --time=%f" % time
         if rerun is not None:
             command += " --rerun=" + rerun
@@ -26,14 +26,14 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
         
         super(ReduceFramesTest, self).__init__(name, [command], **kwargs)
 
-    def preHook(self, workDir="."):
+    def preHook(self, workDir=".", **kwargs):
         suprimeDataDir = os.path.split(os.path.abspath(workDir))
         if suprimeDataDir[-1] in ("SUPA", "HSC"):
             # hsc.pipe.base.camera.getButler will add this directory on
             suprimeDataDir = suprimeDataDir[:-1]
         os.environ['SUPRIME_DATA_DIR'] = os.path.join(*suprimeDataDir)
 
-    def validate(self, workDir="."):
+    def validate(self, workDir=".", **kwargs):
         self.validatePbs()
         
         cameraInfo = CameraInfo(self.camera)
@@ -46,5 +46,5 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
                 dataId = {'visit': visit, 'ccd': ccd}
                 self.validateCcd(butler, dataId)
 
-    def postHook(self, *args, **kwargs):
+    def postHook(self, **kwargs):
         afwIU.resetFilters() # So other cameras may be run        

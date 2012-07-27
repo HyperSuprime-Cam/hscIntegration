@@ -26,13 +26,13 @@ class ProcessCcdTest(CommandsTest, CcdValidationTest):
         
         super(ProcessCcdTest, self).__init__(name, [command], **kwargs)
         
-    def validate(self, workDir="."):
+    def validate(self, workDir=".", **kwargs):
         cameraInfo = CameraInfo(self.camera)
         butler = hscCamera.getButler(self.camera, rerun=self.rerun,
                                      root=os.path.join(workDir, cameraInfo.addDir))
         self.validateCcd(butler, self.dataId)
 
-    def postHook(self, *args, **kwargs):
+    def postHook(self, **kwargs):
         afwIU.resetFilters() # So other cameras may be run        
 
 

@@ -7,7 +7,7 @@ import hsc.pipe.base.camera as hscCamera
 import lsst.afw.image.utils as afwIU
 
 class ReduceDetrendsTest(PbsTest, CcdValidationTest):
-    def __init__(self, name, camera, detrend, visits, nodes=4, procs=8, time=1200, queue=None, rerun=None,
+    def __init__(self, name, camera, detrend, visits, time=1200, queue=None, rerun=None,
                  **kwargs):
         self.camera = camera
         self.visits = visits
@@ -17,8 +17,8 @@ class ReduceDetrendsTest(PbsTest, CcdValidationTest):
         command = os.path.join(os.environ['HSCPIPE_DIR'], 'bin', 'reduceDetrends.py') + " "
         command += " --job=" + name
         command += " --instrument=" + camera
-        command += " --nodes=%d" % nodes
-        command += " --procs=%d" % procs
+        command += " --nodes=@NODES@"
+        command += " --procs=@PROCS@"
         command += " --time=%f" % time
         command += " --detrend=" + detrend
         if rerun is not None:
@@ -29,14 +29,14 @@ class ReduceDetrendsTest(PbsTest, CcdValidationTest):
         
         super(ReduceDetrendsTest, self).__init__(name, [command], **kwargs)
 
-    def preHook(self, workDir="."):
+    def preHook(self, workDir=".", **kwargs):
         suprimeDataDir = os.path.split(os.path.abspath(workDir))
         if suprimeDataDir[-1] in ("SUPA", "HSC"):
             # hsc.pipe.base.camera.getButler will add this directory on
             suprimeDataDir = suprimeDataDir[:-1]
         os.environ['SUPRIME_DATA_DIR'] = os.path.join(*suprimeDataDir)
 
-    def validate(self, workDir="."):
+    def validate(self, **kwargs):
         self.validatePbs()
         
 #        cameraInfo = CameraInfo(self.camera)
@@ -49,5 +49,5 @@ class ReduceDetrendsTest(PbsTest, CcdValidationTest):
 #                dataId = {'visit': visit, 'ccd': ccd}
 #                self.validateCcd(butler, dataId)
 
-    def postHook(self, *args, **kwargs):
+    def postHook(self, **kwargs):
         afwIU.resetFilters() # So other cameras may be run        
