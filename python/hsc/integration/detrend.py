@@ -1,6 +1,5 @@
 import os, os.path
 from hsc.integration.test import PbsTest
-from hsc.integration.camera import CameraInfo
 from hsc.integration.ccdValidation import CcdValidationTest
 
 import hsc.pipe.base.camera as hscCamera
@@ -38,16 +37,7 @@ class ReduceDetrendsTest(PbsTest, CcdValidationTest):
 
     def validate(self, **kwargs):
         self.validatePbs()
-        
-#        cameraInfo = CameraInfo(self.camera)
-#        butler = hscCamera.getButler(self.camera, rerun=self.rerun,
-#                                     root=os.path.join(workDir, cameraInfo.addDir))
-#        numCcds = hscCamera.getNumCcds(self.camera)
-#
-#        for visit in self.visits:
-#            for ccd in range(numCcds):
-#                dataId = {'visit': visit, 'ccd': ccd}
-#                self.validateCcd(butler, dataId)
+        # XXX additional validation?
 
     def postHook(self, **kwargs):
         afwIU.resetFilters() # So other cameras may be run        
