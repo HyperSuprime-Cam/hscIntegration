@@ -34,7 +34,7 @@ class SuprimeCamCameraInfo(CameraInfo):
 
 class HscCameraInfo(CameraInfo):
     def __init__(self):
-        super(SuprimeCamCameraInfo, self).__init__(
+        super(HscCameraInfo, self).__init__(
             addDir = "HSC",
             refileScript = "refileHscFiles.py",
             override = os.path.join(os.environ['HSCPIPE_DIR'], 'config', 'hsc.py'),
