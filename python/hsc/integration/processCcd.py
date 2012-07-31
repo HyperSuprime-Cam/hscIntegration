@@ -18,7 +18,7 @@ class ProcessCcdTest(CommandsTest, CcdValidationTest):
         cameraInfo = CameraInfo(camera)
         command = os.path.join(os.environ['HSCPIPE_DIR'], 'bin', 'scProcessCcd.py') + \
                   " " + camera + " @WORKDIR@/" + cameraInfo.addDir + \
-                  " --doraise -C " + cameraInfo.override + \
+                  " --doraise" + \
                   " --id visit=%d ccd=%d" % (self.visit, self.ccd)
         
         if rerun is not None:
