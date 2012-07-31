@@ -1,6 +1,6 @@
 import os, os.path
 from hsc.integration.test import PbsTest
-from hsc.integration.camera import CameraInfo
+from hsc.integration.camera import getCameraInfo
 from hsc.integration.ccdValidation import CcdValidationTest
 
 import hsc.pipe.base.camera as hscCamera
@@ -36,7 +36,7 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
     def validate(self, workDir=".", **kwargs):
         self.validatePbs()
         
-        cameraInfo = CameraInfo(self.camera)
+        cameraInfo = getCameraInfo(self.camera)
         butler = hscCamera.getButler(self.camera, rerun=self.rerun,
                                      root=os.path.join(workDir, cameraInfo.addDir))
         numCcds = hscCamera.getNumCcds(self.camera)

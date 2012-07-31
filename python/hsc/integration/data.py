@@ -1,6 +1,6 @@
 import os, os.path
 from hsc.integration.test import CommandsTest
-from hsc.integration.camera import CameraInfo
+from hsc.integration.camera import getCameraInfo
 
 class DataTest(CommandsTest):
     def __init__(self, name, camera, source):
@@ -11,7 +11,7 @@ class DataTest(CommandsTest):
                 if f.endswith('.fits'):
                     inputs.append(os.path.join(dirpath, f))
                     self.fitsFiles.add(f)
-        cameraInfo = CameraInfo(camera)
+        cameraInfo = getCameraInfo(camera)
         self.registryDir = cameraInfo.addDir
         commandList = [[os.path.join(os.environ['OBS_SUBARU_DIR'], "bin", cameraInfo.refileScript),
                         "--link", "--execute", "--root=@WORKDIR@"] + inputs,
@@ -37,7 +37,7 @@ class CalibTest(CommandsTest):
         self.camera = camera
         self.source = source
         commandList = []
-        cameraInfo = CameraInfo(camera)
+        cameraInfo = getCameraInfo(camera)
         if source is not None:
             # Get calibrations from the source
             for dirpath, dirnames, filenames in os.walk(source):
@@ -56,7 +56,7 @@ class CalibTest(CommandsTest):
         super(CalibTest, self).__init__(name, commandList)
 
     def getTargetDir(self, workDir):
-        cameraInfo = CameraInfo(self.camera)
+        cameraInfo = getCameraInfo(self.camera)
         return os.path.join(workDir, cameraInfo.addDir, "CALIB")
 
     def execute(self, workDir=".", **kwargs):
