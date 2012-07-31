@@ -14,6 +14,7 @@ class CcdValidationTest(Test):
                         "plotEllipseGrid", "plotEllipticityGrid"],
                  metadataExist=['FLAG_AUTO', 'FLAG_USR', 'FLAG_TAG',
                                 'COLORTERM1', 'COLORTERM2', 'COLORTERM3',
+                                'ELL_MED', 'ELL_PA_MED',
                                 ],
                  metadataValidate={'NOBJ_BRIGHT': positive,
                                    'NOBJ_MATCHED': positive,
@@ -39,6 +40,7 @@ class CcdValidationTest(Test):
                                    'FLATNESS_NGRIDS': positive,
                                    'FLATNESS_MESHX': positive,
                                    'FLATNESS_MESHY': positive,
+                                   'SEEING_MODE': positive,
                                    },
                  **kwargs):
         super(CcdValidationTest, self).__init__(name, **kwargs)
