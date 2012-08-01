@@ -123,7 +123,7 @@ class CommandsTest(Test):
         for command in self.commandList:
             if not self._call(command, stdout=logger):
                 self.success = False
-                self.log.write("*** Failed.")
+                self.log.write("*** Failed.\n")
                 break
         self.stream = logger.stream # In case we want to grep the logs for validation
 
