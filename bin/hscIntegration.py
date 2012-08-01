@@ -8,31 +8,32 @@ from hsc.integration.reduceFrames import ReduceFramesTest
 from hsc.integration.detrend import ReduceDetrendsTest
 from hsc.integration.data import DataTest, CalibTest
 from hsc.integration.solvetansip import SolveTansipTest
+
 from hsc.integration.database import DbCreateTest, DbRawTest
 
 dataDir = os.environ['HSCINTEGRATIONDATA_DIR']
 
 # Suprime-Cam tests
-Integration.register(DbCreateTest("scDbCreate", "suprimecam", "Raw_Sup", "localhost",
-                                  "hscIntegration_sc", os.getlogin(), os.getlogin()))
-Integration.register(DbRawTest("scDbRaw", "suprimecam", "localhost", "hscIntegration_sc", os.getlogin(),
-                               os.getlogin(), os.path.join(dataDir, 'SuprimeCam')))
-                               
-###
-###
-###Integration.register(DataTest("scData", "suprimecam", os.path.join(dataDir, 'SuprimeCam')))
-###Integration.register(ReduceDetrendsTest("scDetrend", "suprimecam", "flat", range(108390, 108401),
-###                                        rerun="detrend"))
-###Integration.register(CalibTest("scCalib", "suprimecam", validity=90))
-###Integration.register(ProcessCcdTest("SUPA01087235", "suprimecam", 108723, 5, rerun="processCcd"))
-###Integration.register(ReduceFramesTest("SUPA0108723X", "suprimecam", [108723], rerun="reduceFrames"))
-###Integration.register(SolveTansipTest("solvetansip", "suprimecam", 108723, rerun="reduceFrames"))
-###
-#### HSC tests
-###Integration.register(DataTest("hscData", "hscsim", os.path.join(dataDir, 'HSC')))
-###Integration.register(CalibTest("hscCalib", "hscsim", os.path.join(dataDir, 'HSC-Calib')))
-###Integration.register(ProcessCcdTest("HSCA00243100", "hscsim", 243, 100, rerun="processCcd"))
-###Integration.register(ReduceFramesTest("HSCA00243XXX", "hsc", [243], rerun="reduceFrames", time=30000))
+#Integration.register(DbCreateTest("scDbCreate", "suprimecam", "Raw_Sup", "localhost",
+#                                  "hscIntegration_sc", os.getlogin(), os.getlogin()))
+#Integration.register(DbRawTest("scDbRaw", "suprimecam", "localhost", "hscIntegration_sc", os.getlogin(),
+#                               os.getlogin(), os.path.join(dataDir, 'SuprimeCam')))
+
+
+
+Integration.register(DataTest("scData", "suprimecam", os.path.join(dataDir, 'SuprimeCam')))
+#Integration.register(ReduceDetrendsTest("scDetrend", "suprimecam", "flat", range(108390, 108401),
+#                                        rerun="detrend"))
+Integration.register(CalibTest("scCalib", "suprimecam", os.path.join(dataDir, 'SC-Calib'), validity=90))
+Integration.register(ProcessCcdTest("SUPA01087235", "suprimecam", 108723, 5, rerun="processCcd"))
+Integration.register(ReduceFramesTest("SUPA0108723X", "suprimecam", [108723], rerun="reduceFrames", time=3000))
+Integration.register(SolveTansipTest("solvetansip", "suprimecam", 108723, rerun="reduceFrames"))
+
+# HSC tests
+Integration.register(DataTest("hscData", "hscSim", os.path.join(dataDir, 'HSC')))
+Integration.register(CalibTest("hscCalib", "hscSim", os.path.join(dataDir, 'HSC-Calib')))
+Integration.register(ProcessCcdTest("HSCA00243100", "hscSim", 243, 100, rerun="processCcd"))
+Integration.register(ReduceFramesTest("HSCA00243XXX", "hscSim", [243], rerun="reduceFrames", time=30000))
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--no-suprimecam", dest="noSC", default=False, action="store_true",
