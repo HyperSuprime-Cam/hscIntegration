@@ -32,11 +32,11 @@ class SuprimeCamCameraInfo(CameraInfo):
             fileTable = hscDb.suppipe_file_mng_tab,
             )
 
-class HscCameraInfo(CameraInfo):
+class HscSimCameraInfo(CameraInfo):
     def __init__(self):
-        super(HscCameraInfo, self).__init__(
+        super(HscSimCameraInfo, self).__init__(
             addDir = "HSC",
-            refileScript = "refileHscFiles.py",
+            refileScript = "refileHSCFiles.py",
             override = os.path.join(os.environ['HSCPIPE_DIR'], 'config', 'hsc.py'),
             dbRaw = "regist_raw_Hsc.py",
             dbFrame = "frame_regist_CorrHsc.py",
@@ -50,6 +50,6 @@ def getCameraInfo(camera):
     """Factory function to produce desired CameraInfo derived class"""
     if camera.lower() == "suprimecam":
         return SuprimeCamCameraInfo()
-    if camera.lower() == "hsc":
-        return HscCameraInfo()
+    if camera.lower() == "hscsim":
+        return HscSimCameraInfo()
     raise RuntimeError("Unrecognised camera name: %s" % camera)
