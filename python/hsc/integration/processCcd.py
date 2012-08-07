@@ -8,7 +8,7 @@ import lsst.afw.image.utils as afwIU
 
 
 class ProcessCcdTest(CommandsTest, CcdValidationTest):
-    def __init__(self, name, camera, visit, ccd, rerun=None, **kwargs):
+    def __init__(self, name, camera, visit, ccd, rerun=None, addOptions="", **kwargs):
         self.camera = camera
         self.visit = visit
         self.ccd = ccd
@@ -18,8 +18,9 @@ class ProcessCcdTest(CommandsTest, CcdValidationTest):
         cameraInfo = getCameraInfo(camera)
         command = os.path.join(os.environ['HSCPIPE_DIR'], 'bin', 'scProcessCcd.py') + \
                   " " + camera + " @WORKDIR@/" + cameraInfo.addDir + \
-                  " --doraise" + \
+                  " --doraise " + addOptions + \
                   " --id visit=%d ccd=%d" % (self.visit, self.ccd)
+        
         
         if rerun is not None:
             command += " --rerun=" + rerun

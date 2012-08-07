@@ -5,6 +5,7 @@ import argparse
 from hsc.integration.integration import Integration
 from hsc.integration.processCcd import ProcessCcdTest
 from hsc.integration.reduceFrames import ReduceFramesTest
+from hsc.integration.reduceStack import ReduceStackTest
 from hsc.integration.detrend import ReduceDetrendsTest
 from hsc.integration.data import DataTest, CalibTest
 from hsc.integration.solvetansip import SolveTansipTest
@@ -12,6 +13,7 @@ from hsc.integration.solvetansip import SolveTansipTest
 from hsc.integration.database import DbCreateTest, DbRawTest
 
 dataDir = os.environ['HSCINTEGRATIONDATA_DIR']
+hscPipeDir = os.environ['HSCPIPE_DIR']
 
 # Suprime-Cam tests
 #Integration.register(DbCreateTest("scDbCreate", "suprimecam", "Raw_Sup", "localhost",
@@ -26,9 +28,13 @@ Integration.register(ReduceDetrendsTest("scDetrend", "suprimecam", "flat", range
                                         rerun="detrend"))
 Integration.register(CalibTest("scCalib", "suprimecam", validity=90))
 Integration.register(ProcessCcdTest("SUPA01087235", "suprimecam", 108723, 5, rerun="processCcd"))
-Integration.register(ReduceFramesTest("SUPA0108723X", "suprimecam", [108723], rerun="reduceFrames",
-                                      time=3000))
+Integration.register(ProcessCcdTest("onsite", "suprimecam", 108723, 0, rerun="onsite",
+                                    addOptions="-C " + os.path.join(hscPipeDir, 'config', 'onsite.py')))
+Integration.register(ReduceFramesTest("reduceFrames-SC", "suprimecam", [108723, 108724, 108725],
+                                      rerun="reduceFrames", time=3000))
 Integration.register(SolveTansipTest("solvetansip", "suprimecam", 108723, rerun="reduceFrames"))
+Integration.register(ReduceStackTest("reduceStack-SC", "suprimecam", "SDSS1115", "W-S-I+",
+                                     rerun="reduceFrames"))
 
 # HSC tests
 Integration.register(DataTest("hscData", "hscSim", os.path.join(dataDir, 'HSC')))
