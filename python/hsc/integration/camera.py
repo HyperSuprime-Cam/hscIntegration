@@ -1,6 +1,14 @@
 import os.path
 
-import hsc.hscDb as hscDb
+try:
+    import hsc.hscDb as hscDb
+except ImportError:
+    print "WARNING: can't import hscDb"
+    class DummyHscDb(object):
+        def __init__(self):
+            self.suppipe_file_mng_tab = "UNKNOWN"
+            self.hscpipe_file_mng_tab = "UNKNOWN"
+    hscDb = DummyHscDb()
 
 
 class CameraInfo(object):

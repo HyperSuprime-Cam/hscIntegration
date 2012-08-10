@@ -11,7 +11,7 @@ from hsc.integration.data import DataTest, CalibTest
 from hsc.integration.solvetansip import SolveTansipTest
 from hsc.integration.pipeQa import PipeQaTest
 
-from hsc.integration.database import DbCreateTest, DbRawTest
+#from hsc.integration.database import DbCreateTest, DbRawTest
 
 dataDir = os.environ['HSCINTEGRATIONDATA_DIR']
 hscPipeDir = os.environ['HSCPIPE_DIR']
@@ -36,8 +36,8 @@ Integration.register(ReduceFramesTest("reduceFrames-SC", "suprimecam", [108723, 
 Integration.register(SolveTansipTest("solvetansip", "suprimecam", 108723, rerun="reduceFrames"))
 Integration.register(ReduceStackTest("reduceStack-SC", "suprimecam", "SDSS1115", "W-S-I+",
                                      rerun="reduceFrames"))
-Integration.register(PipeQaTest("pipeQa-SC", "suprimecam", [108723, 108724, 108725], "reduceFrames",
-                                "pipeQa-SC"))
+#Integration.register(PipeQaTest("pipeQa-SC", "suprimecam", [108723, 108724, 108725], "reduceFrames",
+#                                "pipeQa-SC"))
 
 # HSC tests
 Integration.register(DataTest("hscData", "hscSim", os.path.join(dataDir, 'HSC')))
