@@ -13,7 +13,6 @@ class CcdValidationTest(Test):
                         "plotSeeingRobust", "plotSeeingMap", "plotEllipseMap", "plotEllipticityMap",
                         "plotFwhmGrid", "plotEllipseGrid", "plotEllipticityGrid"],
                  metadataExist=['FLAG_AUTO', 'FLAG_USR', 'FLAG_TAG',
-                                'COLORTERM1', 'COLORTERM2', 'COLORTERM3',
                                 'ELL_MED', 'ELL_PA_MED',
                                 ],
                  metadataValidate={'NOBJ_BRIGHT': positive,
