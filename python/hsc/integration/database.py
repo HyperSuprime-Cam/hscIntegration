@@ -48,6 +48,7 @@ class DbCreateTest(CommandsTest, DbValidateTest):
         command = os.path.join(os.environ['HSCDB_DIR'], 'bin', 'create_HscDb.py')
         command += " --dbtype=" + dbType
         command += " --dbname=" + dbName
+        command += " --drop"
         self.dbPort = dbPort
 
         cameraInfo = getCameraInfo(camera)
