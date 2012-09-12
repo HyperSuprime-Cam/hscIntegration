@@ -42,8 +42,8 @@ Integration.register(ReduceStackTest("reduceStack-SC", "suprimecam", "SDSS1115",
 # HSC tests
 Integration.register(DataTest("hscData", "hscSim", os.path.join(dataDir, 'HSC')))
 Integration.register(CalibTest("hscCalib", "hscSim", os.path.join(dataDir, 'HSC-Calib')))
-Integration.register(ProcessCcdTest("HSCA00243100", "hscSim", 243, 100, rerun="processCcd"))
-Integration.register(ReduceFramesTest("HSCA00243XXX", "hscSim", [243], rerun="reduceFrames", time=40000))
+Integration.register(ProcessCcdTest("HSCA00003100", "hscSim", 3, 100, rerun="processCcd"))
+Integration.register(ReduceFramesTest("HSCA00003XXX", "hscSim", [3], rerun="reduceFrames", time=40000))
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--no-suprimecam", dest="noSC", default=False, action="store_true",
@@ -63,8 +63,8 @@ parser.add_argument("--procs", type=int, default=8, help="Number of processors p
 args = parser.parse_args()
 
 suprimecamTests = {"scData", "scCalib", "SUPA01087235", "SUPA0108723X"}
-hscTests = {"hscData", "hscCalib", "HSCA00243100", "HSCA00243XXX"}
-pbsTests = {"SUPA0108723X", "HSCA00243XXX"}
+hscTests = {"hscData", "hscCalib", "HSCA00243100", "HSCA00003XXX"}
+pbsTests = {"SUPA0108723X", "HSCA00003XXX"}
 dataTests = {"scData", "scCalib", "hscData", "hscCalib"}
 solvetansipTests = {"solvetanisp"}
 
