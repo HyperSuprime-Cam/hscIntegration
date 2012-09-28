@@ -15,6 +15,7 @@ class CameraInfo(object):
     """Base class for camera-specific options"""
     def __init__(self, **kwargs):
         for kw in ("addDir",            # Additional directory elements to add to workdir
+                   "abbrev",            # Abbreviation of name, used in some scripts
                    "refileScript",      # Name of script for filing exposures
                    "override",          # Name of configuration override file for processCcd
                    "dbRaw",             # Name of script for registering raw exposures in PGSQL
@@ -31,6 +32,7 @@ class SuprimeCamCameraInfo(CameraInfo):
     def __init__(self):
         super(SuprimeCamCameraInfo, self).__init__(
             addDir = "SUPA",
+            abbrev = "SC",
             refileScript = "refileSupaFiles.py",
             override = os.path.join(os.environ['HSCPIPE_DIR'], 'config', 'suprimecam.py'),
             dbRaw = "regist_raw_Suprime.py",
@@ -44,6 +46,7 @@ class HscSimCameraInfo(CameraInfo):
     def __init__(self):
         super(HscSimCameraInfo, self).__init__(
             addDir = "HSC",
+            abbrev = "HSC",
             refileScript = "refileHSCFiles.py",
             override = os.path.join(os.environ['HSCPIPE_DIR'], 'config', 'hsc.py'),
             dbRaw = "regist_raw_Hsc.py",
