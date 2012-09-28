@@ -16,7 +16,7 @@ class DataTest(CommandsTest):
         commandList = [[os.path.join(os.environ['OBS_SUBARU_DIR'], "bin", cameraInfo.refileScript),
                         "--link", "--execute", "--root=@WORKDIR@"] + inputs,
                        [os.path.join(os.environ['OBS_SUBARU_DIR'], "bin", "genInputRegistry.py"),
-                        "--create", "--root=@WORKDIR@/" + self.registryDir, "--camera=" + camera]
+                        "--create", "--root=@WORKDIR@/" + self.registryDir, "--camera=" + cameraInfo.abbrev]
                        ]
         super(DataTest, self).__init__(name, commandList)
 
