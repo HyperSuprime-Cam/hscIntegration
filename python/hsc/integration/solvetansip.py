@@ -14,7 +14,8 @@ class SolveTansipTest(CommandsTest):
         if rerun is not None:
             command += " --rerun=" + rerun
 
-        super(SolveTansipTest, self).__init__(name, [command], **kwargs)
+        super(SolveTansipTest, self).__init__(name, [command], keywords=["data", "astrometry", camera],
+                                              **kwargs)
 
 
     def validate(self, *args, **kwargs):

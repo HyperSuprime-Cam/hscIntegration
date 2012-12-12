@@ -14,7 +14,7 @@ class PipeQaTest(CommandsTest):
         pipeQa = os.path.join(os.environ['TESTING_PIPEQA_DIR'], 'bin', 'pipeQa.py') + \
             " -C " + camera + " -v (" + "|".join(map(str, visits)) + ") -R " + rerun + " ."
 
-        super(PipeQaTest, self).__init__(name, [mkdir, newQa, pipeQa])
+        super(PipeQaTest, self).__init__(name, [mkdir, newQa, pipeQa], keywords=["qa", camera])
         
 
     def preHook(self, workDir=".", **kwargs):

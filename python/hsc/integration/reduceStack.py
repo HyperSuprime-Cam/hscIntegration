@@ -25,7 +25,7 @@ class ReduceStackTest(PbsTest):
             command += "--queue=" + queue
         command += " " + field + " " + filtName
         
-        super(ReduceStackTest, self).__init__(name, [command], **kwargs)
+        super(ReduceStackTest, self).__init__(name, [command], keywords=["pbs", "stack", camera], **kwargs)
 
     def preHook(self, workDir=".", **kwargs):
         suprimeDataDir = os.path.split(os.path.abspath(workDir))

@@ -35,8 +35,9 @@ class Log(object):
 
 
 class Test(object):
-    def __init__(self, name):
+    def __init__(self, name, keywords=[]):
         self.name = name
+        self.keywords = set(keywords)
         self.log = Log("%s.log" % self.name, mode="a")
         self.success = True
 

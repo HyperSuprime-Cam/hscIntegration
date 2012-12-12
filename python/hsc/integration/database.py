@@ -57,7 +57,8 @@ class DbCreateTest(CommandsTest, DbValidateTest):
 
         super(DbCreateTest, self).__init__(name, [command], dbHost=dbHost, dbName=dbName, 
                                            dbUser=dbUser, dbPass=dbPass, query=query,
-                                           numRowsValidate=numRowsValidate, **kwargs)
+                                           numRowsValidate=numRowsValidate, 
+                                           keywords=["db", camera], **kwargs)
 
     def validate(self, **kwargs):
         self.validateDatabase()
@@ -86,7 +87,7 @@ class DbRawTest(CommandsTest, DbValidateTest):
 
         super(DbRawTest, self).__init__(name, commandList, dbHost=dbHost, dbName=dbName, dbUser=dbUser,
                                         dbPass=dbPass, query=query, numRowsValidate=numRowsValidate,
-                                        **kwargs)
+                                        keywords=["db", camera], **kwargs)
 
 #    def preHook(self, workDir=".", **kwargs):
 #        suprimeDataDir = os.path.split(os.path.abspath(workDir))

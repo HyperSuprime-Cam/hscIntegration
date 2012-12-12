@@ -25,7 +25,7 @@ class ProcessCcdTest(CommandsTest, CcdValidationTest):
         if rerun is not None:
             command += " --rerun=" + rerun
         
-        super(ProcessCcdTest, self).__init__(name, [command], **kwargs)
+        super(ProcessCcdTest, self).__init__(name, [command], keywords=["process", camera], **kwargs)
         
     def validate(self, workDir=".", **kwargs):
         cameraInfo = getCameraInfo(self.camera)

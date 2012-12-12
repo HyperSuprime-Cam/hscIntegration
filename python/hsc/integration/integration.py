@@ -3,13 +3,14 @@ from collections import OrderedDict
 
 class Integration(object):
     """A suite of integration tests"""
-    _known = OrderedDict()
+    _known = OrderedDict() # List of known tests by name; to be executed in order
 
-    def __init__(self, exclude=[]):
+    def __init__(self, exclude=[], deactivate=[]):
         """Construct an integration test suite containing tests with the provided names"""
         self._tests = OrderedDict()
-        for name in self._known:
-            if name not in exclude:
+        deactivate = set(deactivate)
+        for name, test in self._known.iteritems():
+            if name not in exclude and deactivate.isdisjoint(test.keywords):
                 self.addTest(self._known[name])
 
     def addTest(self, test):
@@ -22,7 +23,10 @@ class Integration(object):
 
     @classmethod
     def register(cls, test):
-        cls._known[test.name] = test
+        name = test.name
+        if name in cls._known:
+            raise RuntimeError("Test %s already exists" % name)
+        cls._known[name] = test
 
     @classmethod
     def getTests(cls):

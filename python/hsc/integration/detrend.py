@@ -26,7 +26,7 @@ class ReduceDetrendsTest(PbsTest, CcdValidationTest):
             command += "--queue=" + queue
         command += " " + ' '.join(map(str, visits))
         
-        super(ReduceDetrendsTest, self).__init__(name, [command], **kwargs)
+        super(ReduceDetrendsTest, self).__init__(name, [command], keywords=["pbs", "calib", camera], **kwargs)
 
     def preHook(self, workDir=".", **kwargs):
         suprimeDataDir = os.path.split(os.path.abspath(workDir))
