@@ -5,12 +5,12 @@ class Integration(object):
     """A suite of integration tests"""
     _known = OrderedDict() # List of known tests by name; to be executed in order
 
-    def __init__(self, exclude=[], deactivate=[]):
+    def __init__(self, only=[], deactivate=[]):
         """Construct an integration test suite containing tests with the provided names"""
         self._tests = OrderedDict()
         deactivate = set(deactivate)
         for name, test in self._known.iteritems():
-            if name not in exclude and deactivate.isdisjoint(test.keywords):
+            if (len(only) == 0 or name in only) and deactivate.isdisjoint(test.keywords):
                 self.addTest(self._known[name])
 
     def addTest(self, test):
@@ -31,3 +31,10 @@ class Integration(object):
     @classmethod
     def getTests(cls):
         return cls._known.keys()
+
+    @classmethod
+    def getKeywords(cls):
+        keywords = set()
+        for test in cls._known.values():
+            keywords.update(test.keywords)
+        return keywords
