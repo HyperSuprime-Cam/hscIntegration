@@ -2,10 +2,12 @@ import os
 import sys
 import time
 import datetime
+import functools
 import subprocess, shlex
 
 def guard(method):
     """Decorator to guard a method against exceptions"""
+    @functools.wraps(method)
     def guarded(self, *args, **kwargs):
         try:
             return method(self, *args, **kwargs)
