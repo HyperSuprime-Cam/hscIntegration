@@ -15,14 +15,31 @@ def guard(method):
     return guarded
 
 
+class Log(object):
+    """A file that doesn't open until you need it
+
+    Attributes are redirected to those of a filehandle that
+    is created only when needed.
+    """
+    def __init__(self, filename, mode="a"):
+        self._filename = filename
+        self._mode = mode
+        self._fh = None # Filehandle, to be created
+
+    def __getattr__(self, attr):
+        if self._fh is None:
+            self._fh = open(self._filename, self._mode)
+        return getattr(self._fh, attr)
+
+
 class Test(object):
     def __init__(self, name):
         self.name = name
-        self.log = open("%s.log" % self.name, "a")
-        self.log.write("*** Test run starting at %s\n" % datetime.datetime.now())
+        self.log = Log("%s.log" % self.name, mode="a")
         self.success = True
 
     def run(self, **kwargs):
+        self.log.write("*** Test run starting at %s\n" % datetime.datetime.now())
         for method in ('preHook', 'execute', 'validate', 'postHook'):
             @guard
             def runMethod(self, **runKwargs):
