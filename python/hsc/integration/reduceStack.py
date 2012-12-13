@@ -27,12 +27,12 @@ class ReduceStackTest(PbsTest):
         
         super(ReduceStackTest, self).__init__(name, ["pbs", "stack", camera], [command], **kwargs)
 
-    def preHook(self, workDir=".", **kwargs):
-        suprimeDataDir = os.path.split(os.path.abspath(workDir))
-        if suprimeDataDir[-1] in ("SUPA", "HSC"):
-            # hsc.pipe.base.camera.getButler will add this directory on
-            suprimeDataDir = suprimeDataDir[:-1]
-        os.environ['SUPRIME_DATA_DIR'] = os.path.join(*suprimeDataDir)
+#    def preHook(self, workDir=".", **kwargs):
+#        suprimeDataDir = os.path.split(os.path.abspath(workDir))
+#        if suprimeDataDir[-1] in ("SUPA", "HSC"):
+#            # hsc.pipe.base.camera.getButler will add this directory on
+#            suprimeDataDir = suprimeDataDir[:-1]
+#        os.environ['SUPRIME_DATA_DIR'] = os.path.join(*suprimeDataDir)
 
     def validate(self, workDir=".", **kwargs):
         self.validatePbs()
