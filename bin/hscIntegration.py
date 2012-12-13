@@ -4,9 +4,9 @@ import argparse
 from hsc.integration import Integration
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--only", action="append", choices=Integration.getTests(),
+parser.add_argument("--only", action="append", default=[], choices=Integration.getTests(),
                     help="Only execute specified tests")
-parser.add_argument("--deactivate", action="append", choices=Integration.getKeywords(),
+parser.add_argument("--deactivate", action="append", default=[], choices=Integration.getKeywords(),
                     help="Deactivate tests with this keyword")
 parser.add_argument("--output", type=str, default=".", help="Output path")
 parser.add_argument("--pbs", type=str, default="--nodes 1 --procs 12 --queue mini",
