@@ -1,0 +1,8 @@
+*.pyo
+*.pyc
+*.cfgc
+*.fits
+.sconf_temp/*
+.sconsign.dblite
+config.log
+python/hsc/integration/version.py
