@@ -16,15 +16,12 @@ class ReduceDetrendsTest(PbsTest, CcdValidationTest):
         command = os.path.join(os.environ['HSCPIPE_DIR'], 'bin', 'reduceDetrends.py') + " "
         command += " --job=" + name
         command += " --instrument=" + camera
-        command += " --nodes=@NODES@"
-        command += " --procs=@PROCS@"
         command += " --time=%f" % time
         command += " --detrend=" + detrend
         if rerun is not None:
             command += " --rerun=" + rerun
-        if queue is not None:
-            command += "--queue=" + queue
-        command += " " + ' '.join(map(str, visits))
+        command += " @PBSARGS@"
+
         
         super(ReduceDetrendsTest, self).__init__(name, [command], keywords=["pbs", "calib", camera], **kwargs)
 

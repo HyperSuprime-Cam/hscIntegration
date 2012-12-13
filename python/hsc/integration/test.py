@@ -167,9 +167,8 @@ class PbsTest(CommandsTest):
         super(PbsTest, self).__init__(name, commandList, setups=setups)
         self.wait = wait
         
-    def execute(self, nodes=4, procs=8, **kwargs):
-        self.commandList = substituteList(self.commandList, "@NODES@", str(nodes))
-        self.commandList = substituteList(self.commandList, "@PROCS@", str(procs))
+    def execute(self, pbsArgs="", **kwargs):
+        self.commandList = substituteList(self.commandList, "@PBSARGS@", pbsArgs)
         super(PbsTest, self).execute()
         self.job = self.getIdentifier(self.stream)
         print "Test %s: waiting for PBS job %s" % (self.name, self.job)
