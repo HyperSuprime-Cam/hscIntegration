@@ -22,7 +22,7 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
             command += " --rerun=" + rerun
         command += " @PBSARGS@"
 
-        super(ReduceFramesTest, self).__init__(name, [command], keywords=["pbs", "process", camera], **kwargs)
+        super(ReduceFramesTest, self).__init__(name, ["pbs", "process", camera], [command], **kwargs)
 
 #    def preHook(self, workDir=".", **kwargs):
 #        suprimeDataDir = os.path.split(os.path.abspath(workDir))

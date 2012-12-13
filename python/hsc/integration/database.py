@@ -55,10 +55,9 @@ class DbCreateTest(CommandsTest, DbValidateTest):
         query = "SELECT * FROM %s" % cameraInfo.fileTable
         numRowsValidate = lambda num: num == 0
 
-        super(DbCreateTest, self).__init__(name, [command], dbHost=dbHost, dbName=dbName, 
+        super(DbCreateTest, self).__init__(name, ["db", camera], [command], dbHost=dbHost, dbName=dbName, 
                                            dbUser=dbUser, dbPass=dbPass, query=query,
-                                           numRowsValidate=numRowsValidate, 
-                                           keywords=["db", camera], **kwargs)
+                                           numRowsValidate=numRowsValidate, **kwargs)
 
     def validate(self, **kwargs):
         self.validateDatabase()
@@ -85,9 +84,9 @@ class DbRawTest(CommandsTest, DbValidateTest):
         query = "SELECT * FROM %s" % cameraInfo.fileTable
         numRowsValidate = lambda num: num == len(self.fileList)
 
-        super(DbRawTest, self).__init__(name, commandList, dbHost=dbHost, dbName=dbName, dbUser=dbUser,
-                                        dbPass=dbPass, query=query, numRowsValidate=numRowsValidate,
-                                        keywords=["db", camera], **kwargs)
+        super(DbRawTest, self).__init__(name, ["db", camera], commandList, dbHost=dbHost, dbName=dbName,
+                                        dbUser=dbUser, dbPass=dbPass, query=query,
+                                        numRowsValidate=numRowsValidate, **kwargs)
 
 #    def preHook(self, workDir=".", **kwargs):
 #        suprimeDataDir = os.path.split(os.path.abspath(workDir))

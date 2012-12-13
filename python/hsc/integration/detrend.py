@@ -30,8 +30,7 @@ class ReduceDetrendsTest(PbsTest, CcdValidationTest):
             command += " --rerun=" + rerun
         command += " @PBSARGS@"
 
-        super(ReduceDetrendsTest, self).__init__(name, [command], keywords=["pbs", "calib", detrend, camera],
-                                                 **kwargs)
+        super(ReduceDetrendsTest, self).__init__(name, ["pbs", "calib", detrend, camera], [command], **kwargs)
 
 #    def preHook(self, workDir=".", **kwargs):
 #        suprimeDataDir = os.path.split(os.path.abspath(workDir))

@@ -18,7 +18,7 @@ class DataTest(CommandsTest):
                        [os.path.join(os.environ['OBS_SUBARU_DIR'], "bin", "genInputRegistry.py"),
                         "--create", "--root=@WORKDIR@/" + self.registryDir, "--camera=" + cameraInfo.abbrev]
                        ]
-        super(DataTest, self).__init__(name, commandList, keywords=["setup", camera])
+        super(DataTest, self).__init__(name, ["setup", camera], commandList)
 
     def validate(self, workDir=".", **kwargs):
         found = set()
@@ -53,7 +53,7 @@ class CalibTest(CommandsTest):
             generate += ["--validity=%d" % validity]
 
         commandList.append(generate)
-        super(CalibTest, self).__init__(name, commandList, keywords=["calib", "setup", camera])
+        super(CalibTest, self).__init__(name, ["calib", "setup", camera], commandList)
 
     def getTargetDir(self, workDir):
         cameraInfo = getCameraInfo(self.camera)

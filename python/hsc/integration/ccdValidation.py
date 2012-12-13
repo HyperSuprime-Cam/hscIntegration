@@ -7,7 +7,7 @@ nonEmpty = lambda s: len(s) > 0
 
 class CcdValidationTest(Test):
     """Mix-in class to validate a CCD"""
-    def __init__(self, name, minMatches=10, minSources=100,
+    def __init__(self, name, keywords, minMatches=10, minSources=100,
                  datasets=["icSrc", "icMatch", "psf", "apCorr", "src", "calexp", "icMatchFull"],
                  files=["ossThumb", "flattenedThumb", "plotMagHist", "plotSeeingRough",
                         "plotSeeingRobust", "plotSeeingMap", "plotEllipseMap", "plotEllipticityMap",
@@ -42,7 +42,7 @@ class CcdValidationTest(Test):
                                    'SEEING_MODE': positive,
                                    },
                  **kwargs):
-        super(CcdValidationTest, self).__init__(name, **kwargs)
+        super(CcdValidationTest, self).__init__(name, keywords, **kwargs)
         self.minMatches = minMatches
         self.minSources = minSources
         self.datasets = set(datasets)

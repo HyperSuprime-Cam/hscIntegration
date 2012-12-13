@@ -35,7 +35,7 @@ class Log(object):
 
 
 class Test(object):
-    def __init__(self, name, keywords=[]):
+    def __init__(self, name, keywords):
         self.name = name
         self.keywords = set(keywords)
         self.log = Log("%s.log" % self.name, mode="a")
@@ -94,8 +94,8 @@ class Test(object):
 
 
 class CommandsTest(Test):
-    def __init__(self, name, commandList, setups=[], **kwargs):
-        super(CommandsTest, self).__init__(name, **kwargs)
+    def __init__(self, name, keywords, commandList, setups=[], **kwargs):
+        super(CommandsTest, self).__init__(name, keywords, **kwargs)
         self.commandList = commandList
         self.setups=[]
         self.stream = None
@@ -163,8 +163,8 @@ class PbsTest(CommandsTest):
     
     SLEEP = 30 # Number of seconds to sleep between polling qstat
 
-    def __init__(self, name, commandList, setups=[], wait=True):
-        super(PbsTest, self).__init__(name, commandList, setups=setups)
+    def __init__(self, name, keywords, commandList, setups=[], wait=True):
+        super(PbsTest, self).__init__(name, keywords, commandList, setups=setups)
         self.wait = wait
         
     def execute(self, pbsArgs="", **kwargs):
