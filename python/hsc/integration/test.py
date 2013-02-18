@@ -179,12 +179,15 @@ class PbsTest(CommandsTest):
             self._wait()
         
     def getIdentifier(self, stream):
-        """Get the PBS job identifier from the provided stream string"""
+        """Get the PBS job identifier from the provided stream string
+
+        It is assumed that this comes from the last line.
+        """
         lines = stream.strip().splitlines()
-        if len(lines) != 1 or not lines[0][0].isdigit():
-            self.log.write("*** ERROR: Expected only a single output line, containing the PBS job identifier")
+        if not lines[0][0].isdigit():
+            self.log.write("*** ERROR: Expected last line would contain the PBS job identifier")
             return None
-        return lines[0]
+        return lines[-1]
 
     def _wait(self):
         """Block until the job is done"""
