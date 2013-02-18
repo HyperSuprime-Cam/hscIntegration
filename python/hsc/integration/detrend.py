@@ -1,8 +1,8 @@
 import os, os.path
 from hsc.integration.test import PbsTest
 from hsc.integration.ccdValidation import CcdValidationTest
+from hsc.integration.camera import getCameraInfo
 
-import hsc.pipe.base.camera as hscCamera
 import lsst.afw.image.utils as afwIU
 
 
@@ -20,10 +20,12 @@ class ReduceDetrendsTest(PbsTest, CcdValidationTest):
         if not detrend in exeNames:
             raise RuntimeError("Unrecognised detrend type: %s vs %s" % (detrend, exeNames.keys()))
 
+        cameraInfo = getCameraInfo(self.camera)
+
         command = os.path.join(os.environ['HSCPIPE_DIR'], 'bin', exeNames[detrend]) + " "
-        command += " " + camera + " @WORKDIR@ "
-        command += " --id " + " ".join("=".join(kv) for kv in idDict.items())
-        command == " --detrendId " + " ".join("=".join(kv) for kv in detrendIdDict.items())
+        command += " " + camera + " @WORKDIR@/" + cameraInfo.addDir + " "
+        command += " --id " + " ".join("=".join(map(str,kv)) for kv in idDict.items())
+        command += " --detrendId " + " ".join("=".join(map(str,kv)) for kv in detrendIdDict.items())
         command += " --job=" + name
         command += " --time=%f" % time
         if rerun is not None:

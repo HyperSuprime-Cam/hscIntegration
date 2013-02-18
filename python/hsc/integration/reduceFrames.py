@@ -2,6 +2,7 @@ import os, os.path
 from hsc.integration.test import PbsTest
 from hsc.integration.camera import getCameraInfo
 from hsc.integration.ccdValidation import CcdValidationTest
+from hsc.integration.camera import getCameraInfo
 
 import hsc.pipe.base.camera as hscCamera
 import lsst.afw.image.utils as afwIU
@@ -13,9 +14,12 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
         self.dataIdList = dataIdList
         self.rerun = rerun
 
+        cameraInfo = getCameraInfo(self.camera)
+
         command = os.path.join(os.environ['HSCPIPE_DIR'], 'bin', 'reduceFrames.py')
-        command += " " + camera + " @WORKDIR@ "
-        command += " --id ".join(" ".join("=".join(kv) for kv in idDict.items()) for idDict in idDictList)
+        command += " " + camera + " @WORKDIR@/" + cameraInfo.addDir + " "
+        for idDict in idDictList:
+            command += "--id " + " ".join("=".join(map(str,kv)) for kv in idDict.items())
         command += " --job=" + name
         command += " --time=%f" % time
         if rerun is not None:
