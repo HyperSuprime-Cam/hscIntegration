@@ -22,9 +22,9 @@ hscPipeDir = os.environ['HSCPIPE_DIR']
 
 
 Integration.register(DataTest("scData", "suprimecam", os.path.join(dataDir, 'SuprimeCam')))
-#Integration.register(ReduceDetrendsTest("scBias", "suprimecam", "bias", {'field': 'BIAS'},
-#                                        {'calibVersion': 0}, rerun="bias"))
-#Integration.register(CalibTest("scCalibBias", "suprimecam", validity=90))
+Integration.register(ReduceDetrendsTest("scBias", "suprimecam", "bias", {'field': 'BIAS'},
+                                        {'calibVersion': "0"}, rerun="bias"))
+Integration.register(CalibTest("scCalibBias", "suprimecam", validity=90))
 Integration.register(ReduceDetrendsTest("scFlat", "suprimecam", "flat", {'field': 'DOMEFLAT'},
                                         {'calibVersion': "one"}, rerun="flat"))
 Integration.register(CalibTest("scCalibFlat", "suprimecam", validity=90))
