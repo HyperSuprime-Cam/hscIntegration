@@ -8,9 +8,9 @@ from hsc.integration.camera import getCameraInfo
 
 class DbValidateTest(Test):
     """Mixin class to validate database"""
-    def __init__(self, name, dbHost=None, dbName=None, dbUser=None, dbPass=None,
+    def __init__(self, name, keywords, dbHost=None, dbName=None, dbUser=None, dbPass=None,
                  query=None, numRowsValidate=None, rowValidate=None):
-        super(DbValidateTest, self).__init__(name)
+        super(DbValidateTest, self).__init__(name, keywords)
         self.dbHost = dbHost
         self.dbName = dbName
         self.dbUser = dbUser
@@ -36,16 +36,24 @@ class DbValidateTest(Test):
         db.close()
 
     def preHook(self, **kwargs):
-        pgpass = open("dot.pgpass", "w")
+       pgpass = open("dot.pgpass", "w")
         pgpass.write("*:*:*:%s:%s\n" % (self.dbUser, self.dbPass))
         os.environ['PGPASSFILE'] = os.path.abspath("dot.pgpass")
         pgpass.close()
         os.chmod("dot.pgpass", 0600)
 
+#
+# To start postgres:
+#
+# price@master:/data1a/work/price/integration $ initdb -D `pwd`/db/
+# price@master:/data1a/work/price/integration $ pg_ctl -D /data1a/work/price/integration/db -l logfile start
+#
+
 
 class DbCreateTest(CommandsTest, DbValidateTest):
     def __init__(self, name, camera, dbType, dbHost, dbName, dbUser, dbPass, dbPort=5432, **kwargs):
         command = os.path.join(os.environ['HSCDB_DIR'], 'bin', 'create_HscDb.py')
+        command += " --dbhost=" + dbHost
         command += " --dbtype=" + dbType
         command += " --dbname=" + dbName
         command += " --drop"
