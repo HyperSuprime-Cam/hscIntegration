@@ -17,7 +17,7 @@ class ReduceFramesTest(PbsTest, CcdValidationTest):
         cameraInfo = getCameraInfo(self.camera)
 
         command = os.path.join(os.environ['HSCPIPE_DIR'], 'bin', 'reduceFrames.py')
-        command += " " + camera + " @WORKDIR@/" + cameraInfo.addDir + " "
+        command += " @WORKDIR@/" + cameraInfo.addDir + " "
         for idDict in idDictList:
             command += "--id " + " ".join("=".join(map(str,kv)) for kv in idDict.items())
         command += " --job=" + name
