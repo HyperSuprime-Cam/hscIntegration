@@ -36,7 +36,7 @@ class DbValidateTest(Test):
         db.close()
 
     def preHook(self, **kwargs):
-       pgpass = open("dot.pgpass", "w")
+        pgpass = open("dot.pgpass", "w")
         pgpass.write("*:*:*:%s:%s\n" % (self.dbUser, self.dbPass))
         os.environ['PGPASSFILE'] = os.path.abspath("dot.pgpass")
         pgpass.close()
@@ -56,6 +56,8 @@ class DbCreateTest(CommandsTest, DbValidateTest):
         command += " --dbhost=" + dbHost
         command += " --dbtype=" + dbType
         command += " --dbname=" + dbName
+        command += " --dbuser=" + dbUser
+        command += " --dbpass=" + dbPass
         command += " --drop"
         self.dbPort = dbPort
 
@@ -84,8 +86,11 @@ class DbRawTest(CommandsTest, DbValidateTest):
                 self.fileList.append(f)
 
                 command = os.path.join(os.environ['HSCDB_DIR'], 'bin', cameraInfo.dbRaw)
-                command += " --execute --copy --root=@WORKDIR@"
-                command += " --dbhost " + dbHost + " --dbname " + dbName
+                command += " --execute --relocate=none --root=@WORKDIR@"
+                command += " --dbhost " + dbHost
+                command += " --dbname " + dbName
+                command += " --dbuser " + dbUser
+                command += " --dbpass " + dbPass
                 command += " " + os.path.join(dirpath, f)
                 commandList.append(command)
 
@@ -139,4 +144,104 @@ class DbSourcesTest:
     Catalog    : frame_match | frame_source | frame_icsource
   Example : ./inputframeobj2.py SUP frame_match SUPA01269690 fh-qa-20120508
 
+"""
+
+
+
+
+
+"""
+Here is the command lines which are called in the 
+onsiteQa's top-level script (in runOnsiteQa).
+
+
+# setups environments 
+source /work/ana/products/loadLSST.sh
+setup hscPipe 1.12.0c_hsc
+setup -j -r /work/ana/astrometry_net_data/sdss-dr8/
+setup -j -r /work/ana/local/hscDb/tip
+setup -j -r /work/ana/local/psycopg2/2.4.5
+
+# or simply  source /data/data1/ope/config/onsiteTest-hscPipe1.11.2_hsc-20130131comm/envExports.sh in 
+# the actual operation.
+
+
+### Frame analysis & Registration of Catalogs
+
+rerun=fh-20130218a
+
+#
+# $HSCDB_DIR/policy/hscDb_param.paf should be edited before running the scProcessCcdOnsiteDb.py
+# to point an appropriate database instance. In the recent operation, database instance is 
+# created for every rerun for Steve-san's demand. 
+# I run doSetupRerun.sh (attached) to do this preparation.
+#
+sh doSetupRerun.sh $rerun
+
+#
+# At Hilo cluster, the scProcessCccOnsiteDb.py is called via torque(pbs) in a jobArray mode 
+# with a command like: 'qsub -t 0-103 qsub_script.sh.
+# ex.
+#  qsub -V -t 0-103 /data/data1/ope/log/2013-02-01/qsub_fram_hsc0901508_13302084_20130201-232507.sh
+#
+anaId=13302084 # provided by a toplevel script
+registId=0     # provided by a toplevel script
+configId=onsiteTest-hscPipe1.11.2_hsc-20130131com # provided by a toplevel script
+overridingConfig=/data/data1/ope/config/$configId/onsite_user_config.py
+
+visit=902048
+ccd=0        
+
+scProcessCcdOnsiteDb.py hscSim /data/data1/Subaru/HSC --calib /data/data1/Subaru/HSC/CALIB/ -C $overridingConfig --doraise --id visit=$visit ccd=$ccd --output /work/Subaru/HSC/rerun/$rerun --anaid $anaId --registid $registId
+
+frameId="HSCA90204800"
+ccd=000
+logDir=/data/data1/ope/log/2013-02-18
+
+outputDir=/work/Subaru/HSC/rerun/$rerun/00398/W-S-I+/output
+filenameSrc=$outputDir/SRC-0901582-${ccd}.fits
+filenameIcsrc=$outputDir/ICSRC-0901582-${ccd}.fits
+filenameMl=$outputDir/ML-0901582-${ccd}.fits
+filenameSrcml=$outputDir/SRCML-0901582-${ccd}.fits
+inputcat1.py HSC frame_source   $frameId $rerun $filenameSrc   $logDir 
+inputcat2.py HSC frame_source   $frameId $rerun $logDir
+inputcat1.py HSC frame_icsource $frameId $rerun $filenameIcsrc $logDir
+inputcat1.py HSC frame_match    $frameId $rerun $filenameMl    $logDir
+inputcat2.py HSC frame_icsource $frameId $rerun $logDir 
+inputcat2.py HSC frame_match    $frameId $rerun $logDir 
+
+
+### Exposure analysis (solvetansip & collecting resulting values from frame analyses)
+
+setup -j -r /work/ana/local/exposureQa/tip
+overridingPaf=/data/data1/ope/config/$configId/onsite_user_policy_expana.pa
+
+exposureQaOnsiteDb.py -i hscSim -I /data/data1/Subaru/HSC -O /data/data2/Subaru/HSC/rerun/$rerun -r $rerun -p $overridingPaf --analysisId $anaId --configId $configId $visit
+
+
+Thank you!
+Hisanori
+#!/bin/sh
+
+# This script setup environment variables with a new rerun and create 
+# a new database instance with the name of the given rerun
+# A paf file for database access is also modified & rsynced across the 
+# master & slave nodes
+
+#export DBNAME=fh-20130118-pipeQa-2
+export DBNAME=$1
+
+echo "Creating new hscana DB with the name: " $DBNAME
+create_HscDb.py -d $DBNAME -T Red_Hsc -U hscana -H hsca-db01
+
+####echo "Truncating HscPipe Raw data entries ..."
+####psql -h hsca-db01 -d hscpipe -U hscana -c "\i /data/data1/devel/hscPipe1.1X/test_run/db_schema/registry/truncate.sql"
+
+echo "Updating hscDb param for query_db and regist_db with the name: " $DBNAME
+\mv /work/ana/local/hscDb/tip/policy/hscDb.paf /work/ana/local/hscDb/tip/policy/hscDb.paf.orig
+cat /work/ana/local/hscDb/tip/policy/hscDb.paf.orig | sed -e "s/^query_db:.*$/query_db: \"$DBNAME\"/" -e "s/^regist_db:.*$/regist_db: \"$DBNAME\"/" > /tmp/hscDb.paf
+\mv /tmp/hscDb.paf /work/ana/local/hscDb/tip/policy/hscDb.paf
+
+echo "Rsyncing hscDb and pipeQA over slave nodes ..."
+sh /work/ana/local/doRsyncHscDbPipeQa.sh
 """
