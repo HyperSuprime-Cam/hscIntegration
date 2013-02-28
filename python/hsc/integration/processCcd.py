@@ -17,7 +17,7 @@ class ProcessCcdTest(CommandsTest, CcdValidationTest):
 
         cameraInfo = getCameraInfo(camera)
         command = os.path.join(os.environ['HSCPIPE_DIR'], 'bin', 'scProcessCcd.py') + \
-                  " " + camera + " @WORKDIR@/" + cameraInfo.addDir + \
+                  " @WORKDIR@/" + cameraInfo.addDir + \
                   " --doraise " + addOptions + \
                   " --id visit=%d ccd=%d" % (self.visit, self.ccd)
         
