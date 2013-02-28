@@ -10,7 +10,7 @@ class SolveTansipTest(CommandsTest):
 
         cameraInfo = getCameraInfo(camera)
         command = os.path.join(os.environ['SOLVETANSIP_DIR'], 'bin', 'solvetansip.py')
-        command += " " + camera + " @WORKDIR@/" + cameraInfo.addDir + " --id visit=%d" % visit
+        command += " @WORKDIR@/" + cameraInfo.addDir + " --id visit=%d" % visit
         if rerun is not None:
             command += " --rerun=" + rerun
 
