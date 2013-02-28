@@ -23,6 +23,7 @@ class CameraInfo(object):
                    "dbExposure",        # Name of script for registering processed exposure in PGSQL
                    "inputCat",          # Name of instrument in inputCat script
                    "fileTable",         # Name of database table with file information
+                   "mapper",            # Name of mapper (for _mapper file)
                    ):
             assert(kw in kwargs)
             setattr(self, kw, kwargs[kw])
@@ -40,6 +41,7 @@ class SuprimeCamCameraInfo(CameraInfo):
             dbExposure = "exposure_regist_CorrSuprime.py",
             inputCat = "SUP",
             fileTable = hscDb.suppipe_file_mng_tab,
+            mapper = "lsst.obs.suprimecam.SuprimecamMapper",
             )
 
 class HscSimCameraInfo(CameraInfo):
@@ -54,6 +56,7 @@ class HscSimCameraInfo(CameraInfo):
             dbExposure = "exposure_regist_CorrHsc.py",
             inputCat = "HSC",
             fileTable = hscDb.hscpipe_file_mng_tab,
+            mapper = "lsst.obs.hscSim.HscSimMapper",
             )
 
 
