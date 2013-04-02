@@ -1,16 +1,17 @@
 import os, os.path
 from hsc.integration.test import PbsTest
-from hsc.integration.ccdValidation import CcdValidationTest
+from hsc.integration.ccdValidation import ButlerValidationTest
 from hsc.integration.camera import getCameraInfo
 
 import lsst.afw.image.utils as afwIU
 
 
-class ReduceDetrendsTest(PbsTest, CcdValidationTest):
-    def __init__(self, name, camera, detrend, idDict, detrendIdDict, rerun, time=1200, **kwargs):
+class ReduceDetrendsTest(PbsTest, ButlerValidationTest):
+    def __init__(self, name, camera, detrend, idDict, detrendIdDict, dataIdList, rerun, time=1200, **kwargs):
         self.camera = camera
         self.detrend = detrend
         self.rerun = rerun
+        self.dataIdList = dataIdList
 
         exeNames = {'bias': 'reduceBias.py',
                     'dark': 'reduceDark.py',
@@ -48,9 +49,14 @@ class ReduceDetrendsTest(PbsTest, CcdValidationTest):
 #            suprimeDataDir = suprimeDataDir[:-1]
 #        os.environ['SUPRIME_DATA_DIR'] = os.path.join(*suprimeDataDir)
 
-    def validate(self, **kwargs):
+    def validate(self, workdir=".", **kwargs):
         self.validatePbs()
-        # XXX additional validation?
+
+        cameraInfo = getCameraInfo(self.camera)
+        butler = hscCamera.getButler(self.camera, rerun=self.rerun,
+                                     root=os.path.join(workDir, cameraInfo.addDir))
+        for dataId in self.dataIdList:
+            self.validateDataset(butler, dataId, self.detrend)
 
     def postHook(self, **kwargs):
         afwIU.resetFilters() # So other cameras may be run
