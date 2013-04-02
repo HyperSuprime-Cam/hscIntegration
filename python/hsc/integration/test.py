@@ -3,7 +3,9 @@ import sys
 import time
 import datetime
 import functools
-import subprocess, shlex
+import subprocess
+import shlex
+import traceback
 
 def guard(method):
     """Decorator to guard a method against exceptions"""
@@ -13,6 +15,7 @@ def guard(method):
             return method(self, *args, **kwargs)
         except Exception, e:
             self.log.write("*** Caught exception %s: %s\n" % (e.__class__, e))
+            traceback.print_exc(file=self.log)
             self.success = False
     return guarded
 
