@@ -5,7 +5,26 @@ import lsst.meas.astrom.astrom as measAstrom
 positive = lambda x: x > 0
 nonEmpty = lambda s: len(s) > 0
 
-class CcdValidationTest(Test):
+class ButlerValidationTest(Test):
+    """Mix-in class to validate butler retrieval"""
+    @guard
+    def validateDataset(self, butler, dataId, dataset):
+        self.assertTrue("%s exists" % dataset, butler.datasetExists(datasetType=dataset, dataId=dataId))
+        data = butler.get(dataset, dataId)
+        if hasattr(data, '__subject__'):
+            # Foil read proxy
+            data = data.__subject__
+        self.assertTrue("%s readable (%s)" % (dataset, data.__class__), data)
+
+    @guard
+    def validateFile(self, butler, dataId, dataset):
+        filename = butler.get(dataset + "_filename", dataId)[0]
+        self.assertTrue("%s exists on disk" % dataset, os.path.exists(filename))
+        self.assertGreater("%s has non-zero size" % dataset, os.stat(filename).st_size, 0)
+
+
+
+class CcdValidationTest(ButlerValidationTest):
     """Mix-in class to validate a CCD"""
     def __init__(self, name, keywords, minMatches=10, minSources=100,
                  datasets=["icSrc", "icMatch", "psf", "apCorr", "src", "calexp", "icMatchFull"],
@@ -51,15 +70,6 @@ class CcdValidationTest(Test):
         self.metadataValidate = metadataValidate
 
     @guard
-    def validateDataset(self, butler, dataId, dataset):
-        self.assertTrue("%s exists" % dataset, butler.datasetExists(datasetType=dataset, dataId=dataId))
-        data = butler.get(dataset, dataId)
-        if hasattr(data, '__subject__'):
-            # Foil read proxy
-            data = data.__subject__
-        self.assertTrue("%s readable (%s)" % (dataset, data.__class__), data)
-
-    @guard
     def validateSources(self, butler, dataId):
         src = butler.get('src', dataId)
         self.assertGreater("Number of sources", len(src), self.minSources)
@@ -86,12 +96,6 @@ class CcdValidationTest(Test):
         for key, validate in self.metadataValidate.iteritems():
             self.assertMetadata(md, key, validate)
 
-
-    @guard
-    def validateFile(self, butler, dataId, dataset):
-        filename = butler.get(dataset + "_filename", dataId)[0]
-        self.assertTrue("%s exists on disk" % dataset, os.path.exists(filename))
-        self.assertGreater("%s has non-zero size" % dataset, os.stat(filename).st_size, 0)
 
     def validateCcd(self, butler, dataId):
         for ds in self.datasets:
