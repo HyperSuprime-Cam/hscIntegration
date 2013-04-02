@@ -1,9 +1,14 @@
 import os, os.path
 from hsc.integration.test import CommandsTest
+from hsc.integration.ccdValidation import ButlerValidationTest
 from hsc.integration.camera import getCameraInfo
+import hsc.pipe.base.camera as hscCamera
 
-class DataTest(CommandsTest):
-    def __init__(self, name, camera, source):
+class DataTest(CommandsTest, ButlerValidationTest):
+    def __init__(self, name, camera, source, dataIdList, datasetType="raw"):
+        self.camera = camera
+        self.dataIdList = dataIdList
+        self.datasetType = datasetType
         self.fitsFiles = set()
         inputs = []
         for dirpath, dirnames, filenames in os.walk(source):
@@ -30,11 +35,19 @@ class DataTest(CommandsTest):
         self.assertEqual("All FITS files filed", found, self.fitsFiles)
         registry = os.path.join(workDir, self.registryDir, "registry.sqlite3")
         self.assertTrue("Registry created", os.path.isfile(registry))
+
+        cameraInfo = getCameraInfo(self.camera)
+        butler = hscCamera.getButler(self.camera, root=os.path.join(workDir, cameraInfo.addDir))
+        for dataId in self.dataIdList:
+            self.validateDataset(butler, dataId, self.datasetType)
+
         return True
 
-class CalibTest(CommandsTest):
-    def __init__(self, name, camera, source=None, validity=None):
+class CalibTest(CommandsTest, ButlerValidationTest):
+    def __init__(self, name, camera, detrend, dataIdList, source=None, validity=None):
         self.camera = camera
+        self.detrend = detrend
+        self.dataIdList = dataIdList
         self.source = source
         commandList = []
         cameraInfo = getCameraInfo(camera)
@@ -73,4 +86,10 @@ class CalibTest(CommandsTest):
         target = self.getTargetDir(workDir)
         registry = os.path.join(target, "calibRegistry.sqlite3")
         self.assertTrue("Registry created", os.path.isfile(registry))
+
+        cameraInfo = getCameraInfo(self.camera)
+        butler = hscCamera.getButler(self.camera, root=os.path.join(workDir, cameraInfo.addDir))
+        for dataId in self.dataIdList:
+            self.validateDataset(butler, dataId, self.detrend)
+
         return True

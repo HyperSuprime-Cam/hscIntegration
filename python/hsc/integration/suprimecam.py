@@ -19,26 +19,20 @@ hscPipeDir = os.environ['HSCPIPE_DIR']
 #Integration.register(DbRawTest("scDbRaw", "suprimecam", "localhost", "hscIntegration_sc", os.getlogin(),
 #                               os.getlogin(), os.path.join(dataDir, 'SuprimeCam')))
 
+dataIdList = [{'visit': v, 'ccd': c} for v in (108723, 108724, 108725) for c in range(10)]
 
-
-Integration.register(DataTest("scData", "suprimecam", os.path.join(dataDir, 'SuprimeCam')))
+Integration.register(DataTest("scData", "suprimecam", os.path.join(dataDir, 'SuprimeCam'), dataIdList))
 Integration.register(ReduceDetrendsTest("scBias", "suprimecam", "bias", {'field': 'BIAS'},
-                                        {'calibVersion': "0"},
-                                        [{'calibDate': '2009-05-24', 'calibVersion': "0", 'ccd': ccd}
-                                         for ccd in range(10)], rerun="bias"))
-Integration.register(CalibTest("scCalibBias", "suprimecam", validity=90))
+                                        {'calibVersion': "0"}, rerun="bias"))
+Integration.register(CalibTest("scCalibBias", "suprimecam", "bias", dataIdList, validity=90))
 Integration.register(ReduceDetrendsTest("scFlat", "suprimecam", "flat", {'field': 'DOMEFLAT'},
-                                        {'calibVersion': "one"},
-                                        [{'calibDate': '2009-05-28', 'calibVersion': "one",
-                                          'filter': 'W-S-I+', 'ccd': ccd} for ccd in range(10)],
-                                        rerun="flat"))
-Integration.register(CalibTest("scCalibFlat", "suprimecam", validity=90))
+                                        {'calibVersion': "one"}, rerun="flat"))
+Integration.register(CalibTest("scCalibFlat", "suprimecam", "flat", dataIdList, validity=90))
 Integration.register(ProcessCcdTest("SUPA01087235", "suprimecam", 108723, 5, rerun="processCcd"))
 Integration.register(ProcessCcdTest("onsite", "suprimecam", 108723, 0, rerun="onsite",
                                     addOptions="-C " + os.path.join(hscPipeDir, 'config', 'onsite.py')))
 Integration.register(ReduceFramesTest("reduceFrames-SC", "suprimecam", [{'visit': '108723..108725'}],
-                                      [{'visit': v, 'ccd': c} for v in (108723, 108724, 108725)
-                                       for c in range(10)], rerun="reduceFrames", time=4000))
+                                      dataIdList, rerun="reduceFrames", time=4000))
 Integration.register(SolveTansipTest("solvetansip", "suprimecam", 108723, rerun="reduceFrames"))
 Integration.register(ReduceStackTest("reduceStack-SC", "suprimecam", "SDSS1115", "W-S-I+",
                                      rerun="reduceFrames"))
