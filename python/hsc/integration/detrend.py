@@ -40,7 +40,7 @@ class ReduceDetrendsTest(PbsTest, ButlerValidationTest):
 #        link += " @WORKDIR@/" + cameraInfo.addDir + "/CALIB/" + detrend.upper()
 
         super(ReduceDetrendsTest, self).__init__(name, ["pbs", "calib", detrend, camera],
-                                                 [command, create], **kwargs)
+                                                 [command], **kwargs)
 
 #    def preHook(self, workDir=".", **kwargs):
 #        suprimeDataDir = os.path.split(os.path.abspath(workDir))
