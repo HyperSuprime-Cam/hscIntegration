@@ -35,12 +35,12 @@ class ReduceDetrendsTest(PbsTest, ButlerValidationTest):
         # XXX The calibs used to end up in the root CALIB directory, but since Jim changed the rerun handling,
         # they go in a new rerun CALIB directory.  I'm more concerned to get things working than fix things up,
         # so here's a workaround.
-        create = "mkdir -p @WORKDIR@/" + cameraInfo.addDir + "/CALIB"
-        link = "ln -s ../rerun/" + detrend + "/CALIB/" + detrend.upper()
-        link += " @WORKDIR@/" + cameraInfo.addDir + "/CALIB/" + detrend.upper()
+#        create = "mkdir -p @WORKDIR@/" + cameraInfo.addDir + "/CALIB"
+#        link = "ln -s ../rerun/" + detrend + "/CALIB/" + detrend.upper()
+#        link += " @WORKDIR@/" + cameraInfo.addDir + "/CALIB/" + detrend.upper()
 
         super(ReduceDetrendsTest, self).__init__(name, ["pbs", "calib", detrend, camera],
-                                                 [command, create, link], **kwargs)
+                                                 [command, create], **kwargs)
 
 #    def preHook(self, workDir=".", **kwargs):
 #        suprimeDataDir = os.path.split(os.path.abspath(workDir))
