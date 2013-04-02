@@ -27,7 +27,8 @@ class ButlerValidationTest(Test):
 class CcdValidationTest(ButlerValidationTest):
     """Mix-in class to validate a CCD"""
     def __init__(self, name, keywords, minMatches=10, minSources=100,
-                 datasets=["icSrc", "icMatch", "psf", "apCorr", "src", "calexp", "icMatchFull"],
+                 datasets=["icSrc", "icMatch", "psf", "src", "calexp", "icMatchFull", "srcMatch",
+                           "srcMatchFull", ],
                  files=["ossThumb", "flattenedThumb", "plotMagHist", "plotSeeingRough",
                         "plotSeeingRobust", "plotSeeingMap", "plotEllipseMap", "plotEllipticityMap",
                         "plotFwhmGrid", "plotEllipseGrid", "plotEllipticityGrid"],
