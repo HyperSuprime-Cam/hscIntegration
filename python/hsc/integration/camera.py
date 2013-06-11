@@ -64,6 +64,6 @@ def getCameraInfo(camera):
     """Factory function to produce desired CameraInfo derived class"""
     if camera.lower() == "suprimecam":
         return SuprimeCamCameraInfo()
-    if camera.lower() == "hscsim":
+    if camera.lower() == "hsc":
         return HscSimCameraInfo()
     raise RuntimeError("Unrecognised camera name: %s" % camera)
