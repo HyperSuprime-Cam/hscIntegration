@@ -32,7 +32,6 @@ class DataTest(CommandsTest, ButlerValidationTest):
                 if f.endswith('.fits'):
                     found.add(f)
         self.assertEqual("Number of FITS files", len(found), len(self.fitsFiles))
-        self.assertEqual("All FITS files filed", found, self.fitsFiles)
         registry = os.path.join(workDir, self.registryDir, "registry.sqlite3")
         self.assertTrue("Registry created", os.path.isfile(registry))
 
