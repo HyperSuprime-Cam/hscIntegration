@@ -45,8 +45,8 @@ class DbValidateTest(Test):
 #
 # To start postgres:
 #
-# price@master:/data1a/work/price/integration $ initdb -D `pwd`/db/
-# price@master:/data1a/work/price/integration $ pg_ctl -D /data1a/work/price/integration/db -l logfile start
+# price@main:/data1a/work/price/integration $ initdb -D `pwd`/db/
+# price@main:/data1a/work/price/integration $ pg_ctl -D /data1a/work/price/integration/db -l logfile start
 #
 
 
@@ -226,7 +226,7 @@ Hisanori
 # This script setup environment variables with a new rerun and create 
 # a new database instance with the name of the given rerun
 # A paf file for database access is also modified & rsynced across the 
-# master & slave nodes
+# main & subordinate nodes
 
 #export DBNAME=fh-20130118-pipeQa-2
 export DBNAME=$1
@@ -242,6 +242,6 @@ echo "Updating hscDb param for query_db and regist_db with the name: " $DBNAME
 cat /work/ana/local/hscDb/tip/policy/hscDb.paf.orig | sed -e "s/^query_db:.*$/query_db: \"$DBNAME\"/" -e "s/^regist_db:.*$/regist_db: \"$DBNAME\"/" > /tmp/hscDb.paf
 \mv /tmp/hscDb.paf /work/ana/local/hscDb/tip/policy/hscDb.paf
 
-echo "Rsyncing hscDb and pipeQA over slave nodes ..."
+echo "Rsyncing hscDb and pipeQA over subordinate nodes ..."
 sh /work/ana/local/doRsyncHscDbPipeQa.sh
 """
